@@ -1,7 +1,7 @@
 import React from 'react';
 
-const NoFoundPage: React.FC = () => (
-  <div>222</div>
+const Home: React.FC = () => (
+  <div>home</div>
 );
 
-export default NoFoundPage;
+export default Home;
