@@ -66,3 +66,13 @@ body {
   background-color: var(--primary-color) !important;
   color: var(--background-darker) !important;
 }
+
+.ant-layout-sider-trigger {
+  background: #1f1f1f !important;
+  border-top: 1px solid #303030;
+  border-right: 1px solid #303030;
+}
+
+.ant-layout-sider-trigger:hover {
+  background: #2a2a2a !important;
+}
