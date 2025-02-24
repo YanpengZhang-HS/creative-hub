@@ -1,8 +1,8 @@
-
 const routes = {
     "/": true,
-    "/landing": true,
-    "/t2v": true,
+
+    "/tools/text": true,
+    "/tools/image": true,
   };
 
   
