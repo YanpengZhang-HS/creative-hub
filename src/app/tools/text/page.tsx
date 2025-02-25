@@ -53,7 +53,7 @@ export default function TextToVideoPage() {
   };
 
   const formatRemainingTime = (progress: number) => {
-    if (progress >= 99) return 'Less than 1 minute';
+    if (progress >= 99) return '< 1 min';
    
     return progress.toFixed(2) + '%';
   };
