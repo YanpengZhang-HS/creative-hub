@@ -1,0 +1,15 @@
+.light-placeholder::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.light-placeholder::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.light-placeholder::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.light-placeholder:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+} 
