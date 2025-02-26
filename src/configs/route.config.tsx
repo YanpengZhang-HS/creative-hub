@@ -1,12 +1,20 @@
-import React from 'react';
+"use client";
+
 import {
   HomeOutlined,
   ToolOutlined,
-  FileOutlined,
   VideoCameraOutlined
 } from '@ant-design/icons';
+import type { ReactNode } from 'react';
 
-export const menuItems = [
+interface MenuItem {
+  key: string;
+  icon?: ReactNode;
+  label: string;
+  children?: MenuItem[];
+}
+
+export const menuItems: MenuItem[] = [
   {
     key: '/',
     icon: <HomeOutlined />,
@@ -32,11 +40,6 @@ export const menuItems = [
     icon: <VideoCameraOutlined />,
     label: 'Creations',
   },
-  {
-    key: 'resources',
-    icon: <FileOutlined />,
-    label: 'Resources',
-  },
 ];
 
-export const NO_SIDEBAR_ROUTES = ['/login', '/register'];
+export * from './route.config.base'; 

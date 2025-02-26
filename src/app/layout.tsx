@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Layout, Menu, ConfigProvider, theme } from "antd";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { useRouter, usePathname } from 'next/navigation';
-import { menuItems, NO_SIDEBAR_ROUTES } from '@/configs/route.config';
+import { menuItems, NO_SIDEBAR_ROUTES, pathToKeys } from '@/configs/route.config';
 import './globals.css';
 import { AntdProvider } from './providers';
 
@@ -13,13 +13,14 @@ const { Header, Content, Footer, Sider } = Layout;
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
-  const pathname = usePathname() || '';
+  const pathname = usePathname() || '/';
 
   const handleMenuClick = ({ key }: { key: string }) => {
     router.push(key);
   };
 
   const showSidebar = !NO_SIDEBAR_ROUTES.includes(pathname);
+  const selectedKeys = pathToKeys[pathname as keyof typeof pathToKeys] || [pathname];
 
   return (
     <html lang="en">
@@ -54,8 +55,8 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 </div>
                 <Menu
                   theme="dark"
-                  defaultSelectedKeys={["/"]}
-                  defaultOpenKeys={["tools", "library"]}
+                  selectedKeys={selectedKeys}
+                  defaultOpenKeys={['tools']}
                   mode="inline"
                   items={menuItems}
                   onClick={handleMenuClick}

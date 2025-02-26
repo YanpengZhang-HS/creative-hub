@@ -3,20 +3,24 @@
 import React from 'react';
 import { Card, Typography, Row, Col, Button } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const { Title, Text } = Typography;
 
 export default function Home() {
+  const router = useRouter();
+  
   const services = [
     {
-      title: "AI Images",
+      title: "Text To Video",
       description: "Powered by JioHotstar AI",
-      link: "/tools/image"
+      link: "/tools/text"
     },
     {
-      title: "AI Videos",
+      title: "Image To Video",
       description: "Powered by JioHotstar AI",
-      link: "/tools/video"
+      link: "/tools/image"
     },
     {
       title: "Effects",
@@ -54,10 +58,12 @@ export default function Home() {
           <Col key={index} xs={24} sm={24} md={8}>
             <Card
               hoverable
+              onClick={() => router.push(service.link)}
               style={{
                 height: '100%',
                 background: 'rgba(0, 0, 0, 0.2)',
                 borderRadius: '12px',
+                cursor: 'pointer'
               }}
               styles={{
                 body: { 
