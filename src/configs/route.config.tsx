@@ -22,7 +22,7 @@ function getItem(
   } as MenuItem;
 }
 
-export const NO_SIDEBAR_ROUTES = ['/tools/text'];
+export const NO_SIDEBAR_ROUTES = [];
 
 export const menuItems: MenuItem[] = [
   getItem("Home", "/", <HomeOutlined />),

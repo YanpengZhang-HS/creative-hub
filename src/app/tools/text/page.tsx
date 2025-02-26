@@ -110,7 +110,7 @@ export default function TextToVideoPage() {
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.header}>
+      {/* <div className={styles.header}>
         <Button 
           type="text"
           icon={<ArrowLeftOutlined />}
@@ -119,7 +119,7 @@ export default function TextToVideoPage() {
         >
           Back to Home
         </Button>
-      </div>
+      </div> */}
 
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
