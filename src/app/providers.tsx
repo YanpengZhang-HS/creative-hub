@@ -16,7 +16,9 @@ export function AntdProvider({ children }: { children: React.ReactNode }) {
           borderRadius: 8,
         },
       }}
-      warning={false}
+      warning={{
+        strict: false,
+      }}
     >
       <AntdRegistry>{children}</AntdRegistry>
     </ConfigProvider>

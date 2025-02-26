@@ -91,8 +91,7 @@ export class Configuration {
         this.serverIndex = param.serverIndex;
         this.baseOptions = {
             headers: {
-                ...param.baseOptions?.headers,
-                'User-Agent': "OpenAPI-Generator/typescript-axios"
+                ...param.baseOptions?.headers
             },
             ...param.baseOptions
         };
