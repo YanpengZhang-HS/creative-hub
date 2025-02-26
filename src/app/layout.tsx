@@ -20,7 +20,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const showSidebar = !NO_SIDEBAR_ROUTES.includes(pathname);
-  const selectedKeys = pathToKeys[pathname as keyof typeof pathToKeys] || [pathname];
+  const selectedKeys = [...(pathToKeys[pathname as keyof typeof pathToKeys] || [pathname])];
 
   return (
     <html lang="en">
