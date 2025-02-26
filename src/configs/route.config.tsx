@@ -1,37 +1,51 @@
+import React from 'react';
 import {
-  FileOutlined,
+  HomeOutlined,
   ToolOutlined,
-  OpenAIOutlined,
-  HomeOutlined
-} from "@ant-design/icons";
-import type { MenuProps } from "antd";
+  FileOutlined,
+  VideoCameraOutlined
+} from '@ant-design/icons';
 
-export type MenuItem = Required<MenuProps>['items'][number];
+export const menuItems = [
+  {
+    key: '/',
+    icon: <HomeOutlined />,
+    label: 'Home',
+  },
+  {
+    key: 'tools',
+    icon: <ToolOutlined />,
+    label: 'Tools',
+    children: [
+      {
+        key: '/tools/text',
+        label: 'Text to Video',
+      },
+      {
+        key: '/tools/image',
+        label: 'Image to Video',
+      },
+    ],
+  },
+  {
+    key: '/creations',
+    icon: <VideoCameraOutlined />,
+    label: 'Creations',
+  },
+  {
+    key: 'resources',
+    icon: <FileOutlined />,
+    label: 'Resources',
+  },
+];
 
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[]
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
+export const NO_SIDEBAR_ROUTES = ['/login', '/register'];
 
-export const NO_SIDEBAR_ROUTES = [];
+const routes = {
+  "/": true,
+  "/tools/text": true,
+  "/tools/image": true,
+  "/creations": true,
+};
 
-export const menuItems: MenuItem[] = [
-  getItem("Home", "/", <HomeOutlined />),
-  getItem("Tools", "tools", <ToolOutlined />, [
-    getItem("Text to Video", "/tools/text"),
-    getItem("Image to Video", "/tools/image"),
-  ]),
-  // getItem("Library", "library", <OpenAIOutlined />, [
-  //   getItem("AI Template", "/library/ai"),
-  // ]),
-  getItem("My Creations", "/creations", <FileOutlined />),
-]; 
+export default routes; 

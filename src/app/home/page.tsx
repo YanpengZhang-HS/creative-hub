@@ -6,7 +6,7 @@ import { RightOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
-export const HomePage = () => {
+export default function Home() {
   const services = [
     {
       title: "AI Images",
@@ -116,6 +116,4 @@ export const HomePage = () => {
       </div>
     </div>
   );
-};
-
-export default HomePage;
+}
