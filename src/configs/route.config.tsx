@@ -40,12 +40,3 @@ export const menuItems = [
 ];
 
 export const NO_SIDEBAR_ROUTES = ['/login', '/register'];
-
-const routes = {
-  "/": true,
-  "/tools/text": true,
-  "/tools/image": true,
-  "/creations": true,
-};
-
-export default routes; 

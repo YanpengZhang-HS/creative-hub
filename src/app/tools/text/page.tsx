@@ -1,20 +1,18 @@
 "use client";
 
-import { Button, Input, Progress } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Button, Input, Progress, message } from 'antd';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
 import { TaskStatus } from '@/network/api';
 import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
+import { API_CONFIG } from '@/configs/api.config';
 
 const { TextArea } = Input;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
 
 export default function TextToVideoPage() {
-  const router = useRouter();
   const [prompt, setPrompt] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,16 +34,28 @@ export default function TextToVideoPage() {
     }
 
     timerRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
-      const percentage = Math.min((elapsed / TOTAL_TIME) * 100, 99); // 最大显示99%
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const percentage = Math.min((elapsed / TOTAL_TIME) * 100, 99);
       setProgress(percentage);
       
       if (elapsed % 60 === 0) {
         backendApi.getTaskStatus(taskId).then((response) => {
-          if (response.status === 200 && response.data.status === TaskStatus.Completed) {
-            setVideoUrl(`http://34.227.168.212:8000/api/v1/tasks/${taskId}/files/output%2Foutput.mp4`);
-            setLoading(false);
-            setProgress(0);
+          if (response.status === 200) {
+            if (response.data.status === TaskStatus.Completed) {
+              setVideoUrl(API_CONFIG.getVideoUrl(taskId));
+              setLoading(false);
+              setProgress(0);
+            } else if (response.data.status === TaskStatus.Failed) {
+              setLoading(false);
+              setProgress(0);
+              message.error({
+                content: response.data.error || 'Failed to generate video',
+                duration: 5,
+                style: {
+                  marginTop: '20vh',
+                }
+              });
+            }
           }
         });
       }
@@ -89,10 +99,24 @@ export default function TextToVideoPage() {
         }
       } else {
         setLoading(false);
+        message.error({
+          content: 'Failed to generate video',
+          duration: 5,
+          style: {
+            marginTop: '20vh',
+          }
+        });
         throw new Error('Failed to generate video');
       }
     } catch (error) {
       setLoading(false);
+      message.error({
+        content: error instanceof Error ? error.message : 'Failed to generate video',
+        duration: 5,
+        style: {
+          marginTop: '20vh',
+        }
+      });
       console.error('Failed to generate video:', error);
     }
   };

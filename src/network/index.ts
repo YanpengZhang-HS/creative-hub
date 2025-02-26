@@ -13,9 +13,10 @@
  */
 import { Configuration } from "./configuration";
 import { DefaultApi } from "./api";
+import { API_CONFIG } from "@/configs/api.config";
 
 const config = new Configuration({
-    basePath: "http://34.227.168.212:8000"
+    basePath: API_CONFIG.BASE_URL
 });
 
 export const backendApi = new DefaultApi(config);
