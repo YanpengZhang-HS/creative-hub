@@ -1,0 +1,102 @@
+.container {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header :global(.ant-tabs-nav) {
+  margin: 0 !important;
+}
+
+.header :global(.ant-tabs-tab) {
+  padding: 12px 0 !important;
+  margin: 0 20px 0 0 !important;
+}
+
+.header :global(.ant-tabs-tab-active) {
+  font-weight: 600 !important;
+}
+
+.search {
+  width: 300px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.videoCard {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1a1a1a;
+  transition: transform 0.2s;
+}
+
+.videoCard:hover {
+  transform: translateY(-4px);
+}
+
+.videoWrapper {
+  position: relative;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.videoWrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.timestamp {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: white;
+}
+
+.actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.videoCard:hover .actions {
+  opacity: 1;
+}
+
+.actions > span {
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 50%;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+}
+
+.actions > span:hover {
+  background: rgba(0, 0, 0, 0.9);
+  color: var(--primary-color);
+}
+
+.favorited {
+  color: var(--primary-color) !important;
+} 

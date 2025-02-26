@@ -66,6 +66,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                   <Menu
                     theme="dark"
                     defaultSelectedKeys={["/"]}
+                    defaultOpenKeys={["tools", "library"]}
                     mode="inline"
                     items={menuItems}
                     onClick={handleMenuClick}

@@ -30,8 +30,8 @@ export const menuItems: MenuItem[] = [
     getItem("Text to Video", "/tools/text"),
     getItem("Image to Video", "/tools/image"),
   ]),
-  getItem("Library", "library", <OpenAIOutlined />, [
-    getItem("AI Template", "/library/ai"),
-  ]),
-  getItem("Resources", "resources", <FileOutlined />),
+  // getItem("Library", "library", <OpenAIOutlined />, [
+  //   getItem("AI Template", "/library/ai"),
+  // ]),
+  getItem("My Creations", "/creations", <FileOutlined />),
 ]; 
