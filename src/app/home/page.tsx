@@ -5,6 +5,7 @@ import { Card, Typography, Row, Col, Button } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { topCreations } from '@/configs/creation.config';
 
 const { Title, Text } = Typography;
 
@@ -116,9 +117,89 @@ export default function Home() {
           color: 'white',
           marginBottom: '24px'
         }}>
-          Created Shorts
+          Top Creations
         </Title>
-        {/* Add trending shorts section here */}
+        <Row gutter={[24, 24]}>
+          {topCreations.map((creation, index) => (
+            <Col xs={24} sm={12} md={8} key={index}>
+              <Card
+                hoverable
+                style={{
+                  background: '#1f1f1f',
+                  border: 'none'
+                }}
+                bodyStyle={{
+                  padding: '24px',
+                  height: '100%'
+                }}
+              >
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%'
+                }}>
+                  <div
+                    style={{
+                      position: 'relative',
+                      paddingBottom: '56.25%', // 16:9 aspect ratio
+                      height: 0,
+                      overflow: 'hidden',
+                      marginBottom: '16px'
+                    }}
+                  >
+                    <video
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none'
+                      }}
+                      src={creation.videoUrl}
+                      title={creation.title}
+                      controls
+                      playsInline
+                    />
+                  </div>
+                  <Title level={4} style={{
+                    color: '#64f4d4',
+                    margin: 0,
+                    marginBottom: '8px'
+                  }}>
+                    {creation.title}
+                  </Title>
+                  <Text
+                    style={{
+                      color: '#888',
+                      fontSize: '14px',
+                      height: '40px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer'
+                    }}
+                    onMouseEnter={(e) => {
+                      const target = e.currentTarget;
+                      target.style.height = 'auto';
+                      target.style.webkitLineClamp = 'unset';
+                    }}
+                    onMouseLeave={(e) => {
+                      const target = e.currentTarget;
+                      target.style.height = '40px';
+                      target.style.webkitLineClamp = '2';
+                    }}
+                  >
+                    {creation.description}
+                  </Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </div>
     </div>
   );
