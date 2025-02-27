@@ -346,7 +346,6 @@ export default function TextToVideoPage() {
                     ) : task.status === TaskStatus.Completed && task.videoUrl ? (
                       <video
                         controls
-                        autoPlay
                         className={styles.video}
                         src={task.videoUrl}
                       >
