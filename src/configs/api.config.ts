@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://34.227.168.212:8000',
+  BASE_URL: process.env.API_BASE_URL || 'http://34.227.168.212:8000',
   ENDPOINTS: {
     TASKS: '/api/v1/tasks',
   },
