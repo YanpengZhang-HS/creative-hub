@@ -1,243 +1,41 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-      "title": "FastAPI",
-      "version": "0.1.0"
-    },
-    "paths": {
-      "/api/v1/task/text_to_video": {
-        "post": {
-          "summary": "Create Text To Video Task",
-          "operationId": "invoke_text_to_video",
-          "requestBody": {
-            "content": {
-              "application/x-www-form-urlencoded": {
-                "schema": {
-                  "$ref": "#/components/schemas/Body_invoke_text_to_video"
-                }
-              }
-            },
-            "required": true
-          },
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/TaskInfo"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/api/v1/task/image_to_video": {
-        "post": {
-          "summary": "Create Image To Video Task",
-          "operationId": "invoke_image_to_video",
-          "requestBody": {
-            "content": {
-              "multipart/form-data": {
-                "schema": {
-                  "$ref": "#/components/schemas/Body_invoke_image_to_video"
-                }
-              }
-            },
-            "required": true
-          },
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/TaskInfo"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/api/v1/tasks/{task_id}": {
-        "get": {
-          "summary": "Get Task Status",
-          "description": "获取任务状态信息，自动检测任务所在目录（waiting/finished）\n\n响应字段说明：\n- task_id: 任务唯一标识\n- status: 任务状态（PENDING/PROCESSING/COMPLETED/FAILED）\n- created_at: 任务创建时间戳\n- started_at: 任务开始处理时间戳（处理中/完成/失败时存在）\n- finished_at: 任务完成时间戳（完成/失败时存在）\n- error: 错误信息（仅失败状态存在）",
-          "operationId": "get_task_status",
-          "parameters": [
-            {
-              "name": "task_id",
-              "in": "path",
-              "required": true,
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/task/text_to_video": {
+      "post": {
+        "summary": "Create Text To Video Task",
+        "operationId": "invoke_text_to_video",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
               "schema": {
-                "type": "string",
-                "title": "Task Id"
+                "$ref": "#/components/schemas/Body_invoke_text_to_video"
               }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/TaskInfo"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
+          },
+          "required": true
         },
-        "delete": {
-          "summary": "Delete Task",
-          "operationId": "delete_task",
-          "parameters": [
-            {
-              "name": "task_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "title": "Task Id"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfo"
                 }
               }
             }
-          }
-        }
-      },
-      "/api/v1/tasks/{task_id}/files/{filename}": {
-        "get": {
-          "summary": "Download Task File",
-          "operationId": "download_task_file",
-          "parameters": [
-            {
-              "name": "task_id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "title": "Task Id"
-              }
-            },
-            {
-              "name": "filename",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string",
-                "title": "Filename"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/api/v1/tasks": {
-        "get": {
-          "summary": "List Tasks",
-          "operationId": "list_tasks",
-          "parameters": [
-            {
-              "name": "status",
-              "in": "query",
-              "required": true,
-              "schema": {
-                "$ref": "#/components/schemas/TaskStatus"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful Response",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/TaskListResponse"
-                  }
-                }
-              }
-            },
-            "422": {
-              "description": "Validation Error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/HTTPValidationError"
-                  }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -245,196 +43,486 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "Body_invoke_image_to_video": {
-          "properties": {
-            "prompt": {
-              "type": "string",
-              "maxLength": 2048,
-              "minLength": 1,
-              "title": "Prompt"
-            },
-            "ml_pipeline": {
-              "$ref": "#/components/schemas/MLPipelineEnum",
-              "description": "使用的模型变体",
-              "default": "cosmos_image_to_video_v1"
-            },
-            "image_file": {
-              "type": "string",
-              "format": "binary",
-              "title": "Image File",
-              "description": "上传的图片文件（最大25MB）"
+    "/api/v1/task/image_to_video": {
+      "post": {
+        "summary": "Create Image To Video Task",
+        "operationId": "invoke_image_to_video",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_invoke_image_to_video"
+              }
             }
           },
-          "type": "object",
-          "required": [
-            "prompt",
-            "image_file"
-          ],
-          "title": "Body_invoke_image_to_video"
+          "required": true
         },
-        "Body_invoke_text_to_video": {
-          "properties": {
-            "prompt": {
-              "type": "string",
-              "maxLength": 2048,
-              "minLength": 1,
-              "title": "Prompt"
-            },
-            "ml_pipeline": {
-              "$ref": "#/components/schemas/MLPipelineEnum",
-              "description": "使用的模型变体",
-              "default": "cosmos_text_to_video_v1"
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfo"
+                }
+              }
             }
           },
-          "type": "object",
-          "required": [
-            "prompt"
-          ],
-          "title": "Body_invoke_text_to_video"
-        },
-        "HTTPValidationError": {
-          "properties": {
-            "detail": {
-              "items": {
-                "$ref": "#/components/schemas/ValidationError"
-              },
-              "type": "array",
-              "title": "Detail"
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/task/video_to_video": {
+      "post": {
+        "summary": "Create Video To Video Task",
+        "operationId": "invoke_video_to_video",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_invoke_video_to_video"
+              }
             }
           },
-          "type": "object",
-          "title": "HTTPValidationError"
+          "required": true
         },
-        "MLPipelineEnum": {
-          "type": "string",
-          "enum": [
-            "dummy_dry_run_v1",
-            "cosmos_text_to_video_v1",
-            "cosmos_image_to_video_v1"
-          ],
-          "title": "MLPipelineEnum",
-          "description": "Standardized model variant enumeration"
-        },
-        "TaskInfo": {
-          "properties": {
-            "task_id": {
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{task_id}": {
+      "get": {
+        "summary": "Get Task Status",
+        "description": "获取任务状态信息，自动检测任务所在目录（waiting/finished）\n\n响应字段说明：\n- task_id: 任务唯一标识\n- status: 任务状态（PENDING/PROCESSING/COMPLETED/FAILED）\n- created_at: 任务创建时间戳\n- started_at: 任务开始处理时间戳（处理中/完成/失败时存在）\n- finished_at: 任务完成时间戳（完成/失败时存在）\n- error: 错误信息（仅失败状态存在）",
+        "operationId": "get_task_status",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
               "type": "string",
               "title": "Task Id"
-            },
-            "ml_pipeline": {
-              "$ref": "#/components/schemas/MLPipelineEnum"
-            },
-            "status": {
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Task",
+        "operationId": "delete_task",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{task_id}/files/{filename}": {
+      "get": {
+        "summary": "Download Task File",
+        "operationId": "download_task_file",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Filename"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tasks": {
+      "get": {
+        "summary": "List Tasks",
+        "operationId": "list_tasks",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": true,
+            "schema": {
               "$ref": "#/components/schemas/TaskStatus"
-            },
-            "created_at": {
-              "type": "number",
-              "title": "Created At"
-            },
-            "started_at": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskListResponse"
                 }
-              ],
-              "title": "Started At"
-            },
-            "finished_at": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
-              ],
-              "title": "Finished At"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_invoke_image_to_video": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Prompt"
+          },
+          "ml_pipeline": {
+            "$ref": "#/components/schemas/MLPipelineEnum",
+            "description": "使用的模型变体",
+            "default": "cosmos_image_to_video_v1"
+          },
+          "image_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Image File",
+            "description": "上传的图片文件（最大25MB）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt",
+          "image_file"
+        ],
+        "title": "Body_invoke_image_to_video"
+      },
+      "Body_invoke_text_to_video": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Prompt"
+          },
+          "negitive_prompt": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 0,
+            "title": "Negitive Prompt",
+            "default": ""
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16",
+              "1:1"
+            ],
+            "title": "Aspect Ratio",
+            "default": "16:9"
+          },
+          "disable_prompt_upsampler": {
+            "type": "boolean",
+            "title": "Disable Prompt Upsampler",
+            "default": false
+          },
+          "ml_pipeline": {
+            "$ref": "#/components/schemas/MLPipelineEnum",
+            "description": "使用的模型变体",
+            "default": "cosmos_text_to_video_v1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "Body_invoke_text_to_video"
+      },
+      "Body_invoke_video_to_video": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Prompt"
+          },
+          "ml_pipeline": {
+            "$ref": "#/components/schemas/MLPipelineEnum",
+            "description": "使用的模型变体",
+            "default": "cosmos_video_to_video_v1"
+          },
+          "video_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Video File",
+            "description": "上传的图片文件（最大25MB）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt",
+          "video_file"
+        ],
+        "title": "Body_invoke_video_to_video"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
             },
-            "error": {
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MLPipelineEnum": {
+        "type": "string",
+        "enum": [
+          "dummy_mock_output_v1",
+          "cosmos_text_to_video_v1",
+          "cosmos_image_to_video_v1",
+          "cosmos_video_to_video_v1"
+        ],
+        "title": "MLPipelineEnum",
+        "description": "Standardized model variant enumeration"
+      },
+      "TaskInfo": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "ml_pipeline": {
+            "$ref": "#/components/schemas/MLPipelineEnum"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "created_at": {
+            "type": "number",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ml_pipeline",
+          "status"
+        ],
+        "title": "TaskInfo",
+        "description": "Structured task information model"
+      },
+      "TaskListResponse": {
+        "properties": {
+          "tasks": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tasks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tasks"
+        ],
+        "title": "TaskListResponse"
+      },
+      "TaskStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "processing",
+          "completed",
+          "failed",
+          "canceled"
+        ],
+        "title": "TaskStatus"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
               "anyOf": [
                 {
                   "type": "string"
                 },
                 {
-                  "type": "null"
+                  "type": "integer"
                 }
-              ],
-              "title": "Error"
-            }
-          },
-          "type": "object",
-          "required": [
-            "ml_pipeline",
-            "status"
-          ],
-          "title": "TaskInfo",
-          "description": "Structured task information model"
-        },
-        "TaskListResponse": {
-          "properties": {
-            "tasks": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array",
-              "title": "Tasks"
-            }
-          },
-          "type": "object",
-          "required": [
-            "tasks"
-          ],
-          "title": "TaskListResponse"
-        },
-        "TaskStatus": {
-          "type": "string",
-          "enum": [
-            "pending",
-            "processing",
-            "completed",
-            "failed",
-            "canceled"
-          ],
-          "title": "TaskStatus"
-        },
-        "ValidationError": {
-          "properties": {
-            "loc": {
-              "items": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "integer"
-                  }
-                ]
-              },
-              "type": "array",
-              "title": "Location"
+              ]
             },
-            "msg": {
-              "type": "string",
-              "title": "Message"
-            },
-            "type": {
-              "type": "string",
-              "title": "Error Type"
-            }
+            "type": "array",
+            "title": "Location"
           },
-          "type": "object",
-          "required": [
-            "loc",
-            "msg",
-            "type"
-          ],
-          "title": "ValidationError"
-        }
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }
+}

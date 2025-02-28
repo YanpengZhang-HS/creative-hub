@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message } from 'antd';
+import { Button, Input, Progress, message, Switch } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -9,6 +9,8 @@ import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
+import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
+import { ReloadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
@@ -52,6 +54,9 @@ export default function TextToVideoPage() {
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
+  const [aspectRatio, setAspectRatio] = useState<InvokeTextToVideoAspectRatioEnum>(InvokeTextToVideoAspectRatioEnum._169);
+  const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
+  const [negativePrompt, setNegativePrompt] = useState('');
 
   // 处理客户端初始化
   useEffect(() => {
@@ -96,7 +101,6 @@ export default function TextToVideoPage() {
     if (taskStatusRef.current[taskId]?.timer) {
       clearInterval(taskStatusRef.current[taskId].timer);
     }
-    console.log('taskId', taskId, tasks);
     // 找到对应任务的创建时间
 
     taskStatusRef.current[taskId] = {
@@ -147,7 +151,12 @@ export default function TextToVideoPage() {
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeTextToVideo(prompt);
+      const response = await backendApi.invokeTextToVideo(
+        prompt,
+        negativePrompt || undefined,
+        aspectRatio,
+        disablePromptUpsampler
+      );
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
@@ -220,27 +229,82 @@ export default function TextToVideoPage() {
               />
             </div>
             <div className={styles.hints}>
-              <span className={styles.hintsLabel}>Examples:</span>
               <div className={styles.hintTags}>
-                <div className={styles.hintTagsRow}>
-                  {samplePrompts.slice(0, 2).map((hint, index) => (
-                    <span 
-                      key={index}
-                      className={styles.hintTag}
-                      onClick={() => handleHintClick(hint)}
-                    >
-                      {hint.split('.')[0]}
-                    </span>
-                  ))}
-                </div>
-                <span 
-                  className={`${styles.hintTag} ${styles.moreTag}`}
+                {samplePrompts.slice(0, 2).map((hint, index) => (
+                  <span 
+                    key={index}
+                    className={styles.hintTag}
+                    onClick={() => handleHintClick(hint)}
+                  >
+                    {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
+                  </span>
+                ))}
+                <Button
+                  type="text"
+                  icon={<ReloadOutlined />}
                   onClick={handleRandomPrompt}
-                >
-                  More
-                </span>
+                  className={styles.refreshButton}
+                />
               </div>
             </div>
+            <div className={styles.settingsSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>⚙️</span>
+                <span>Settings</span>
+              </div>
+              <div className={styles.settingsContent}>
+                <div className={styles.settingItem}>
+                  <span className={styles.settingLabel}>Aspect Ratio</span>
+                  <div className={styles.aspectRatioButtons}>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                      className={styles.aspectButton}
+                    >
+                      16:9
+                    </Button>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                      className={styles.aspectButton}
+                    >
+                      9:16
+                    </Button>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                      className={styles.aspectButton}
+                    >
+                      1:1
+                    </Button>
+                  </div>
+                </div>
+                <div className={styles.settingItem}>
+                  <span className={styles.settingLabel}>Prompt Optimization</span>
+                  <Switch
+                    checked={!disablePromptUpsampler}
+                    onChange={(checked) => setDisablePromptUpsampler(!checked)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.negativePromptSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>⛔</span>
+                <span>Negative Prompt (Optional)</span>
+              </div>
+              <div className={styles.inputWrapper}>
+                <TextArea
+                  value={negativePrompt}
+                  onChange={(e) => setNegativePrompt(e.target.value)}
+                  placeholder="Enter elements you don't want to see in the video"
+                  className={styles.input}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
             <div className={styles.buttonGroup}>
               <Button
                 type="primary"
@@ -290,27 +354,82 @@ export default function TextToVideoPage() {
             />
           </div>
           <div className={styles.hints}>
-            <span className={styles.hintsLabel}>Examples:</span>
             <div className={styles.hintTags}>
-              <div className={styles.hintTagsRow}>
-                {samplePrompts.slice(0, 2).map((hint, index) => (
-                  <span 
-                    key={index}
-                    className={styles.hintTag}
-                    onClick={() => handleHintClick(hint)}
-                  >
-                    {hint.split('.')[0]}
-                  </span>
-                ))}
-              </div>
-              <span 
-                className={`${styles.hintTag} ${styles.moreTag}`}
+              {samplePrompts.slice(0, 2).map((hint, index) => (
+                <span 
+                  key={index}
+                  className={styles.hintTag}
+                  onClick={() => handleHintClick(hint)}
+                >
+                  {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
+                </span>
+              ))}
+              <Button
+                type="text"
+                icon={<ReloadOutlined />}
                 onClick={handleRandomPrompt}
-              >
-                More
-              </span>
+                className={styles.refreshButton}
+              />
             </div>
           </div>
+          <div className={styles.settingsSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.icon}>⚙️</span>
+              <span>Settings</span>
+            </div>
+            <div className={styles.settingsContent}>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>Aspect Ratio</span>
+                <div className={styles.aspectRatioButtons}>
+                  <Button
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                    className={styles.aspectButton}
+                  >
+                    16:9
+                  </Button>
+                  <Button
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                    className={styles.aspectButton}
+                  >
+                    9:16
+                  </Button>
+                  <Button
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                    className={styles.aspectButton}
+                  >
+                    1:1
+                  </Button>
+                </div>
+              </div>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>Prompt Optimization</span>
+                <Switch
+                  checked={!disablePromptUpsampler}
+                  onChange={(checked) => setDisablePromptUpsampler(!checked)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.negativePromptSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.icon}>⛔</span>
+              <span>Negative Prompt (Optional)</span>
+            </div>
+            <div className={styles.inputWrapper}>
+              <TextArea
+                value={negativePrompt}
+                onChange={(e) => setNegativePrompt(e.target.value)}
+                placeholder="Enter elements you don't want to see in the video"
+                className={styles.input}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
           <div className={styles.buttonGroup}>
             <Button
               type="primary"
