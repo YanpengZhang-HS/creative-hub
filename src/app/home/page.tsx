@@ -6,6 +6,7 @@ import { RightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { topCreations } from '@/configs/creation.config';
+import styles from './Home.module.css';
 
 const { Title, Text } = Typography;
 
@@ -111,7 +112,8 @@ export default function Home() {
       <div style={{ 
         marginTop: '60px',
         borderTop: '1px solid #303030',
-        paddingTop: '40px'
+        paddingTop: '40px',
+        paddingBottom: '100px'
       }}>
         <Title level={3} style={{ 
           color: 'white',
@@ -124,10 +126,7 @@ export default function Home() {
             <Col xs={24} sm={12} md={8} key={index}>
               <Card
                 hoverable
-                style={{
-                  background: '#1f1f1f',
-                  border: 'none'
-                }}
+                className={styles.hoverCard}
                 styles={{
                   body: {
                     padding: '24px',
@@ -136,8 +135,8 @@ export default function Home() {
                 }}
               >
                 <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
+                  position: 'relative',
+                  width: '100%',
                   height: '100%'
                 }}>
                   <div

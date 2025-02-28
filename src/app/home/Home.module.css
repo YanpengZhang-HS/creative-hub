@@ -1,0 +1,21 @@
+.hoverCard {
+  background: #1f1f1f;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 200px;  /* Adjust this value based on your needs */
+  display: flex;
+  flex-direction: column;
+}
+
+.hoverCard:hover {
+  position: absolute;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  width: 100%;  /* Changed from inherit to 100% */
+  left: 0;
+  top: 0;
+  min-height: 200px;  /* Added to maintain minimum height on hover */
+} 
