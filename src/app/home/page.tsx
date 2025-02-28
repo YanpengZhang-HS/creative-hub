@@ -128,9 +128,11 @@ export default function Home() {
                   background: '#1f1f1f',
                   border: 'none'
                 }}
-                bodyStyle={{
-                  padding: '24px',
-                  height: '100%'
+                styles={{
+                  body: {
+                    padding: '24px',
+                    height: '100%'
+                  }
                 }}
               >
                 <div style={{
