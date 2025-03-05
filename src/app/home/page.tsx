@@ -20,6 +20,11 @@ export default function Home() {
       link: "/tools/text"
     },
     {
+      title: "Text To Image",
+      description: "Powered by JioHotstar AI",
+      link: "/tools/text2image"
+    },
+    {
       title: "Image To Video",
       description: "Powered by JioHotstar AI",
       link: "/tools/image"

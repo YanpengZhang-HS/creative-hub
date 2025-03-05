@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch, Tooltip } from 'antd';
+import { Button, Input, Progress, message, Switch } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -10,10 +10,10 @@ import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
 import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { ReloadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
-const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
+const TOTAL_TIME = 20 ; // 20 minutes in seconds
 
 interface TaskTimerStatus {
   timer: NodeJS.Timeout;
@@ -48,7 +48,7 @@ const PlaceholderContent = () => (
   </div>
 );
 
-export default function TextToVideoPage() {
+export default function TextToImagePage() {
   const [prompt, setPrompt] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isClient, setIsClient] = useState(false);
@@ -61,13 +61,15 @@ export default function TextToVideoPage() {
   // 处理客户端初始化
   useEffect(() => {
     setIsClient(true);
-    const savedTasks = localStorage.getItem('tasks');
+    const savedTasks = localStorage.getItem('image_tasks');
+
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         setTasks(parsedTasks);
         // 恢复进行中任务的状态检查
         parsedTasks.forEach((task: Task) => {
+          console.log("<<<", task)
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -80,7 +82,7 @@ export default function TextToVideoPage() {
 
   // 保存任务到 localStorage
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('tasks', JSON.stringify(newTasks));
+    localStorage.setItem('image_tasks', JSON.stringify(newTasks));
     setTasks(newTasks);
   }, []);
 
@@ -90,7 +92,7 @@ export default function TextToVideoPage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('tasks', JSON.stringify(newTasks));
+      localStorage.setItem('image_tasks', JSON.stringify(newTasks));
       return newTasks;
     });
   }, []);
@@ -114,26 +116,27 @@ export default function TextToVideoPage() {
         taskStatusRef.current[taskId].progress = percentage;
         updateTaskStatus(taskId, { status: TaskStatus.Processing });
 
-        if (elapsed % 60 === 0) {
+        if (elapsed % 5 === 0) {
           backendApi.getTaskStatus(taskId).then((response) => {
+            console.log("<<<", response)
             if (response.status === 200) {
               if (response.data.status === TaskStatus.Completed) {
-                const videoUrl = API_CONFIG.getVideoUrl(taskId);
+                const imageUrl = API_CONFIG.getImageUrl(taskId);
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Completed,
-                  videoUrl 
+                  imageUrl 
                 });
                 clearInterval(taskStatusRef.current[taskId].timer);
                 delete taskStatusRef.current[taskId];
               } else if (response.data.status === TaskStatus.Failed) {
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Failed,
-                  error: response.data.error || 'Failed to generate video'
+                  error: response.data.error || 'Failed to generate image'
                 });
                 clearInterval(taskStatusRef.current[taskId].timer);
                 delete taskStatusRef.current[taskId];
                 message.error({
-                  content: response.data.error || 'Failed to generate video',
+                  content: response.data.error || 'Failed to generate image',
                   duration: 5,
                   style: { marginTop: '20vh' }
                 });
@@ -151,7 +154,7 @@ export default function TextToVideoPage() {
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeTextToVideo(
+      const response = await backendApi.invokeTextToImage(
         prompt,
         negativePrompt || undefined,
         aspectRatio,
@@ -162,11 +165,10 @@ export default function TextToVideoPage() {
         if (taskId) {
           const newTask: Task = {
             id: taskId,
-            taskType: 'text_to_video',
             prompt: prompt.trim(),
             createdAt: response.data.created_at as number * 1000,
             status: response.data.status,
-            aspectRatio: aspectRatio
+            taskType: 'text_to_image',
           };
           
           saveTasks([newTask, ...tasks]);
@@ -175,14 +177,14 @@ export default function TextToVideoPage() {
         }
       } else {
         message.error({
-          content: 'Failed to generate video',
+          content: 'Failed to generate image',
           duration: 5,
           style: { marginTop: '20vh' }
         });
       }
     } catch (error) {
       message.error({
-        content: error instanceof Error ? error.message : 'Failed to generate video',
+        content: error instanceof Error ? error.message : 'Failed to generate image',
         duration: 5,
         style: { marginTop: '20vh' }
       });
@@ -282,12 +284,7 @@ export default function TextToVideoPage() {
                   </div>
                 </div>
                 <div className={styles.settingItem}>
-                  <span className={styles.settingLabel}>
-                    Prompt Optimization
-                    <Tooltip title="Enable prompt upsampler with LLM">
-                      <InfoCircleOutlined />
-                    </Tooltip>
-                  </span>
+                  <span className={styles.settingLabel}>Prompt Optimization</span>
                   <Switch
                     checked={!disablePromptUpsampler}
                     onChange={(checked) => setDisablePromptUpsampler(!checked)}
@@ -412,12 +409,7 @@ export default function TextToVideoPage() {
                 </div>
               </div>
               <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>
-                  Prompt Optimization
-                  <Tooltip title="Enable prompt upsampler with LLM">
-                    <InfoCircleOutlined />
-                  </Tooltip>
-                </span>
+                <span className={styles.settingLabel}>Prompt Optimization</span>
                 <Switch
                   checked={!disablePromptUpsampler}
                   onChange={(checked) => setDisablePromptUpsampler(!checked)}
@@ -460,14 +452,7 @@ export default function TextToVideoPage() {
             <div className={styles.taskList}>
               {tasks.map(task => (
                 <div key={task.id} className={styles.taskItem}>
-                  <div 
-                    className={styles.taskContent}
-                    data-aspect-ratio={
-                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? "1:1" :
-                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? "9:16" :
-                      "16:9"
-                    }
-                  >
+                  <div className={styles.taskContent}>
                     {task.status === TaskStatus.Processing ? (
                       <div className={styles.progressContainer}>
                         <Progress 
@@ -479,16 +464,18 @@ export default function TextToVideoPage() {
                             '100%': '#1677ff',
                           }}
                         />
-                        <p className={styles.progressText}>Generating video...</p>
+                        <p className={styles.progressText}>Generating image...</p>
                       </div>
-                    ) : task.status === TaskStatus.Completed && task.videoUrl ? (
-                      <video
-                        controls
-                        className={styles.video}
-                        src={task.videoUrl}
-                      >
-                        Your browser does not support video playback
-                      </video>
+                    ) : task.status === TaskStatus.Completed && task.imageUrl ? (
+                      <img
+                        src={task.imageUrl}
+                        alt="Start Creating"
+                        style={{
+                          width: 'auto',
+                          height: '100%',
+                          borderRadius: '8px'
+                        }}
+                        />
                     ) : task.status === TaskStatus.Failed ? (
                       <div className={styles.errorContainer}>
                         <p className={styles.errorText}>{task.error || 'Failed to generate video'}</p>
