@@ -156,9 +156,10 @@ export default function TextToImagePage() {
     try {
       const response = await backendApi.invokeTextToImage(
         prompt,
-        negativePrompt || undefined,
-        aspectRatio,
-        disablePromptUpsampler
+        // comment these params as these are not supported yet
+        // negativePrompt || undefined,
+        // aspectRatio,
+        // disablePromptUpsampler
       );
       if (response.status === 200) {
         const taskId = response.data.task_id;
