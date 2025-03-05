@@ -1,4 +1,4 @@
-import { TaskStatus } from "@/network/api";
+import { InvokeTextToVideoAspectRatioEnum, TaskStatus } from "@/network/api";
 
 export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video';
 
@@ -24,4 +24,5 @@ export interface Task {
   videoUrl?: string;
   imageUrl?: string;
   error?: string;
+  aspectRatio?: InvokeTextToVideoAspectRatioEnum;
 } 

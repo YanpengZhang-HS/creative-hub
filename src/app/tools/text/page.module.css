@@ -182,11 +182,38 @@
   color: var(--primary-color) !important;
 }
 
+.taskContent {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 360px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.taskContent[data-aspect-ratio="16:9"] {
+  width: 100%;
+}
+
+.taskContent[data-aspect-ratio="9:16"] {
+  width: 202.5px; /* 360px * 9/16 */
+}
+
+.taskContent[data-aspect-ratio="1:1"] {
+  width: 360px;
+}
+
 .video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  max-height: none;
+  background: #000;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .placeholder {
@@ -251,6 +278,8 @@
   gap: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
+  width: 100%;
 }
 
 .taskItem:hover {
@@ -258,19 +287,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.taskContent {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1280/704;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
 .taskInfo {
+  width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -366,46 +384,91 @@
 .settingLabel {
   color: #888;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settingLabel :global(.anticon) {
+  color: #666;
+  font-size: 14px;
+  cursor: help;
+}
+
+.tooltipWrapper :global(.ant-tooltip) {
+  max-width: 300px;
+}
+
+.tooltipWrapper :global(.ant-tooltip-inner) {
+  background-color: #1f1f1f !important;
+  border: 1px solid #2a2b2e;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.tooltipWrapper :global(.ant-tooltip-arrow-content::before) {
+  background: #1f1f1f !important;
 }
 
 .aspectRatioButtons {
   display: flex;
-  gap: 8px;
+  gap: 24px;
   padding: 2px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  padding: 4px;
+  background: transparent;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  border: none;
 }
 
 .aspectButton {
-  min-width: 60px;
-  height: 32px;
-  padding: 0 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid #2a2b2e;
-  color: #666;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
+  background: transparent;
+  border: 2.5px solid #2a2b2e;
+  color: #888;
   transition: all 0.2s ease;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* 16:9 aspect ratio button */
+.aspectButton:nth-child(1) {
+  width: 64px;
+  height: 36px;
+  border-radius: 4px;
+}
+
+/* 9:16 aspect ratio button */
+.aspectButton:nth-child(2) {
+  width: 36px;
+  height: 64px;
+  border-radius: 4px;
+}
+
+/* 1:1 aspect ratio button */
+.aspectButton:nth-child(3) {
+  width: 48px;
+  height: 48px;
   border-radius: 4px;
 }
 
 .aspectButton:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background: rgba(var(--primary-color-rgb), 0.1);
-}
-
-.aspectRatioButtons .aspectButton[type='primary'],
-.aspectButton[type='primary'] {
-  display: none;
+  background: transparent;
 }
 
 .leftSection .settingsContent .aspectRatioButtons .aspectButton[type='primary'] {
-  background: var(--primary-color);
+  background: transparent;
   border-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 0 12px rgba(var(--primary-color-rgb), 0.3);
-  font-weight: 500;
+  color: var(--primary-color);
+  box-shadow: none;
+  font-weight: normal;
 }
 
 .settingItem :global(.ant-switch) {

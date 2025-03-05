@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch } from 'antd';
+import { Button, Input, Progress, message, Switch, Tooltip } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
 import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
@@ -165,7 +165,8 @@ export default function TextToVideoPage() {
             taskType: 'text_to_video',
             prompt: prompt.trim(),
             createdAt: response.data.created_at as number * 1000,
-            status: response.data.status
+            status: response.data.status,
+            aspectRatio: aspectRatio
           };
           
           saveTasks([newTask, ...tasks]);
@@ -281,7 +282,12 @@ export default function TextToVideoPage() {
                   </div>
                 </div>
                 <div className={styles.settingItem}>
-                  <span className={styles.settingLabel}>Prompt Optimization</span>
+                  <span className={styles.settingLabel}>
+                    Prompt Optimization
+                    <Tooltip title="Enable prompt upsampler with LLM">
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </span>
                   <Switch
                     checked={!disablePromptUpsampler}
                     onChange={(checked) => setDisablePromptUpsampler(!checked)}
@@ -406,7 +412,12 @@ export default function TextToVideoPage() {
                 </div>
               </div>
               <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>Prompt Optimization</span>
+                <span className={styles.settingLabel}>
+                  Prompt Optimization
+                  <Tooltip title="Enable prompt upsampler with LLM">
+                    <InfoCircleOutlined />
+                  </Tooltip>
+                </span>
                 <Switch
                   checked={!disablePromptUpsampler}
                   onChange={(checked) => setDisablePromptUpsampler(!checked)}
@@ -449,7 +460,14 @@ export default function TextToVideoPage() {
             <div className={styles.taskList}>
               {tasks.map(task => (
                 <div key={task.id} className={styles.taskItem}>
-                  <div className={styles.taskContent}>
+                  <div 
+                    className={styles.taskContent}
+                    data-aspect-ratio={
+                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? "16:9" :
+                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? "9:16" :
+                      "1:1"
+                    }
+                  >
                     {task.status === TaskStatus.Processing ? (
                       <div className={styles.progressContainer}>
                         <Progress 
