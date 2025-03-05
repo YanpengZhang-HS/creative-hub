@@ -162,6 +162,7 @@ export default function TextToVideoPage() {
         if (taskId) {
           const newTask: Task = {
             id: taskId,
+            taskType: 'text_to_video',
             prompt: prompt.trim(),
             createdAt: response.data.created_at as number * 1000,
             status: response.data.status

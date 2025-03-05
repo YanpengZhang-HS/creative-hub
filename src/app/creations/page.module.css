@@ -1,29 +1,46 @@
-.container {
-  padding: 24px;
-}
-
-.header {
+.hoverCard {
+  background: #1f1f1f;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 200px;  /* Adjust this value based on your needs */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  flex-direction: column;
 }
 
-.header :global(.ant-tabs-nav) {
-  margin: 0 !important;
+.hoverCard:hover {
+  position: relative;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  width: 100%;
+  min-height: 200px;
+  margin-bottom: -100px; /* Allow card to overlap next row */
 }
 
-.header :global(.ant-tabs-tab) {
-  padding: 12px 0 !important;
-  margin: 0 20px 0 0 !important;
+.hoverCard:hover .collapsedPrompt {
+  -webkit-line-clamp: unset;
+   /* Expand prompt area */
+  margin-bottom: 100px;
+  transition: margin-bottom 0.3s ease;
 }
 
-.header :global(.ant-tabs-tab-active) {
-  font-weight: 600 !important;
+.promptText {
+  color: #e0e0e0;
+  font-size: 14px;
+  margin: 0;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
 
-.search {
-  width: 300px;
+.collapsedPrompt {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 
 .grid {
@@ -99,4 +116,4 @@
 
 .favorited {
   color: var(--primary-color) !important;
-} 
+}
