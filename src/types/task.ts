@@ -17,7 +17,7 @@ export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
 
 export interface Task {
   id: string;
-  taskType: TaskType;
+  taskType?: TaskType;
   prompt: string;
   createdAt: number;
   status: TaskStatus;
