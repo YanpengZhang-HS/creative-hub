@@ -130,6 +130,8 @@
   overflow: hidden;
   min-height: 0;
   margin-right: 24px;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .inputWrapper {
@@ -188,8 +190,9 @@
 .video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   max-height: none;
+  background: #000;
 }
 
 .placeholder {
@@ -246,40 +249,64 @@
 }
 
 .taskItem {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-items: center;
 }
 
 .taskItem:hover {
-  background: rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .taskContent {
-  width: 100%;
-  height: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #000;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 360px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.taskContent[data-aspect-ratio="16:9"] {
+  width: 100%;
+}
+
+.taskContent[data-aspect-ratio="9:16"] {
+  width: 202.5px; /* 360px * 9/16 */
+}
+
+.taskContent[data-aspect-ratio="1:1"] {
+  width: 360px;
 }
 
 .taskInfo {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-bottom: 8px;
 }
 
 .taskPrompt {
   color: #fff;
   font-size: 14px;
   margin: 0;
-  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .taskTime {
@@ -363,17 +390,47 @@
 
 .aspectRatioButtons {
   display: flex;
-  gap: 8px;
+  gap: 24px;
+  padding: 2px;
+  background: transparent;
+  justify-content: center;
+  align-items: center;
 }
 
 .aspectButton {
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 4px;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
   background: transparent;
-  border: 1px solid #2a2b2e;
-  color: #fff;
+  border: 2.5px solid #2a2b2e;
+  color: #888;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 13px;
+}
+
+/* 16:9 aspect ratio button */
+.aspectRatioButtons .aspectButton:nth-child(1) {
+  width: 64px;
+  height: 36px;
+  border-radius: 4px;
+}
+
+/* 9:16 aspect ratio button */
+.aspectRatioButtons .aspectButton:nth-child(2) {
+  width: 36px;
+  height: 64px;
+  border-radius: 4px;
+}
+
+/* 1:1 aspect ratio button */
+.aspectRatioButtons .aspectButton:nth-child(3) {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
 }
 
 .aspectButton:hover {

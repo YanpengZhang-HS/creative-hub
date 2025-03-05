@@ -34,17 +34,29 @@ const formatRemainingTime = (progress: number | undefined) => {
 };
 
 // 提取占位内容为组件以保持一致性
-const PlaceholderContent = () => (
+const PlaceholderContent = ({ aspectRatio }: { aspectRatio: InvokeImageToVideoAspectRatioEnum }) => (
   <div className={styles.taskList}>
-    <div className={styles.placeholder}>
-      <Image
-        src="/create_guide.svg"
-        alt="Start Creating"
-        width={240}
-        height={240}
-        priority
-      />
-      <p>Create your first masterpiece!</p>
+    <div className={styles.taskItem}>
+      <div className={styles.taskContent} data-aspect-ratio={
+        aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? "16:9" :
+        aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? "9:16" :
+        aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? "1:1" : "16:9"
+      }>
+        <div className={styles.placeholder}>
+          <Image
+            src="/create_guide.svg"
+            alt="Start Creating"
+            width={180}
+            height={180}
+            priority
+          />
+          <p>Create your first masterpiece!</p>
+        </div>
+      </div>
+      <div className={styles.taskInfo}>
+        <p className={styles.taskPrompt}>Upload an image and create amazing videos!</p>
+        <p className={styles.taskTime}>{new Date().toLocaleString()}</p>
+      </div>
     </div>
   </div>
 );
@@ -169,9 +181,11 @@ export default function ImageToVideoPage() {
         if (taskId) {
           const newTask: Task = {
             id: taskId,
+            taskType: 'image_to_video',
             prompt: promptToUse,
             createdAt: response.data.created_at as number * 1000,
-            status: response.data.status
+            status: response.data.status,
+            aspectRatio: aspectRatio
           };
           
           saveTasks([newTask, ...tasks]);
@@ -370,7 +384,7 @@ export default function ImageToVideoPage() {
             </div>
           </div>
           <div className={styles.rightSection}>
-            <PlaceholderContent />
+            <PlaceholderContent aspectRatio={aspectRatio} />
           </div>
         </div>
       </div>
@@ -501,7 +515,11 @@ export default function ImageToVideoPage() {
             <div className={styles.taskList}>
               {tasks.map(task => (
                 <div key={task.id} className={styles.taskItem}>
-                  <div className={styles.taskContent}>
+                  <div className={styles.taskContent} data-aspect-ratio={
+                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? "16:9" :
+                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? "9:16" :
+                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? "1:1" : "16:9"
+                  }>
                     {task.status === TaskStatus.Processing ? (
                       <div className={styles.progressContainer}>
                         <Progress 
@@ -539,7 +557,7 @@ export default function ImageToVideoPage() {
               ))}
             </div>
           ) : (
-            <PlaceholderContent />
+            <PlaceholderContent aspectRatio={aspectRatio} />
           )}
         </div>
       </div>
