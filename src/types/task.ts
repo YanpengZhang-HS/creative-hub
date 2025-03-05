@@ -6,5 +6,6 @@ export interface Task {
   createdAt: number;
   status: TaskStatus;
   videoUrl?: string;
+  imageUrl?: string;
   error?: string;
 } 

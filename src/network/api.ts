@@ -394,6 +394,67 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Create Text To Video Task
+         * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {InvokeTextToVideoAspectRatioEnum} [aspectRatio] 
+         * @param {boolean} [disablePromptUpsampler] 
+         * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invokeTextToImage: async (prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'prompt' is not null or undefined
+            assertParamExists('invokeTextToVideo', 'prompt', prompt)
+            const localVarPath = `/api/v1/task/text_to_image`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+            const localVarFormParams = new URLSearchParams();
+
+
+            if (prompt !== undefined) { 
+                localVarFormParams.set('prompt', prompt as any);
+            }
+    
+            if (negitivePrompt !== undefined) { 
+                localVarFormParams.set('negitive_prompt', negitivePrompt as any);
+            }
+    
+            if (aspectRatio !== undefined) { 
+                localVarFormParams.set('aspect_ratio', aspectRatio as any);
+            }
+    
+            if (disablePromptUpsampler !== undefined) { 
+                localVarFormParams.set('disable_prompt_upsampler', disablePromptUpsampler as any);
+            }
+    
+            if (mlPipeline !== undefined) { 
+                localVarFormParams.set('ml_pipeline', mlPipeline as any);
+            }
+    
+    
+            localVarHeaderParameter['Content-Type'] = 'application/x-www-form-urlencoded';
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = localVarFormParams.toString();
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Create Video To Video Task
          * @param {string} prompt 
          * @param {File} videoFile 上传的图片文件（最大25MB）
@@ -566,6 +627,23 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Create Text To Video Task
+         * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {InvokeTextToVideoAspectRatioEnum} [aspectRatio] 
+         * @param {boolean} [disablePromptUpsampler] 
+         * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async invokeTextToImage(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeTextToImage(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeTextToImage']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Create Video To Video Task
          * @param {string} prompt 
          * @param {File} videoFile 上传的图片文件（最大25MB）
@@ -658,6 +736,20 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeTextToVideo(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create Text To Video Task
+         * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {InvokeTextToVideoAspectRatioEnum} [aspectRatio] 
+         * @param {boolean} [disablePromptUpsampler] 
+         * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invokeTextToImage(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
+            return localVarFp.invokeTextToImage(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -757,6 +849,23 @@ export class DefaultApi extends BaseAPI {
     public invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeTextToVideo(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
+
+    /**
+     * 
+     * @summary Create Text To Video Task
+     * @param {string} prompt 
+     * @param {string} [negitivePrompt] 
+     * @param {InvokeTextToVideoAspectRatioEnum} [aspectRatio] 
+     * @param {boolean} [disablePromptUpsampler] 
+     * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public invokeTextToImage(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).invokeTextToImage(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(this.axios, this.basePath));
+    }
+
 
     /**
      * 

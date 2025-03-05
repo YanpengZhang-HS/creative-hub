@@ -5,6 +5,7 @@ export const pathToKeys: Record<string, string[]> = {
   '/': ['/'],
   // Tools section
   '/tools/text': ['/tools/text', 'tools'],
+  '/tools/text2image': ['/tools/text2image', 'tools'],
   '/tools/image': ['/tools/image', 'tools'],
   '/creations': ['/creations'],
 };

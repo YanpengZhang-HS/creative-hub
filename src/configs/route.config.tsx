@@ -30,6 +30,10 @@ export const menuItems: MenuItem[] = [
         label: 'Text to Video',
       },
       {
+        key: '/tools/text2image',
+        label: 'Text to Image',
+      },
+      {
         key: '/tools/image',
         label: 'Image to Video',
       },

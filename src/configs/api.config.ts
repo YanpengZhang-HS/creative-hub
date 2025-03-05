@@ -5,4 +5,6 @@ export const API_CONFIG = {
   },
   getVideoUrl: (taskId: string) => 
     `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TASKS}/${taskId}/files/output%2Foutput.mp4`,
+  getImageUrl: (taskId: string) => 
+    `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.TASKS}/${taskId}/files/output%2Foutput.png`,
 }; 
