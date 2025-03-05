@@ -1,6 +1,6 @@
 import { InvokeTextToVideoAspectRatioEnum, TaskStatus } from "@/network/api";
 
-export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video';
+export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video' | 'text_to_image';
 
 export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
   switch (taskType) {
@@ -17,7 +17,7 @@ export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
 
 export interface Task {
   id: string;
-  taskType?: TaskType;
+  taskType: TaskType;
   prompt: string;
   createdAt: number;
   status: TaskStatus;

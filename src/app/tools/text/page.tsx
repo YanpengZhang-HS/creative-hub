@@ -463,9 +463,9 @@ export default function TextToVideoPage() {
                   <div 
                     className={styles.taskContent}
                     data-aspect-ratio={
-                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? "16:9" :
+                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? "1:1" :
                       task.aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? "9:16" :
-                      "1:1"
+                      "16:9"
                     }
                   >
                     {task.status === TaskStatus.Processing ? (

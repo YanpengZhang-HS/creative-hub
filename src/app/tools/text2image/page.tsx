@@ -167,7 +167,8 @@ export default function TextToImagePage() {
             id: taskId,
             prompt: prompt.trim(),
             createdAt: response.data.created_at as number * 1000,
-            status: response.data.status
+            status: response.data.status,
+            taskType: 'text_to_image',
           };
           
           saveTasks([newTask, ...tasks]);
