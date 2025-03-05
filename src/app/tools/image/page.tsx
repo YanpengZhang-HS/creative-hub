@@ -9,7 +9,7 @@ import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
-import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
+import { InvokeImageToVideoAspectRatioEnum } from '@/network/api';
 import { ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
@@ -55,8 +55,7 @@ export default function ImageToVideoPage() {
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
-  const [aspectRatio, setAspectRatio] = useState<InvokeTextToVideoAspectRatioEnum>(InvokeTextToVideoAspectRatioEnum._169);
-  const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<InvokeImageToVideoAspectRatioEnum>(InvokeImageToVideoAspectRatioEnum._169);
   const [negativePrompt, setNegativePrompt] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -150,37 +149,29 @@ export default function ImageToVideoPage() {
   }, [tasks, updateTaskStatus]);
 
   const handleGenerate = async () => {
-    if (!prompt.trim() || !imageFile) {
-      if (!prompt.trim()) {
-        message.error({
-          content: 'Please enter a prompt',
-          duration: 3,
-          style: { marginTop: '20vh' }
-        });
-      }
-      if (!imageFile) {
-        message.error({
-          content: 'Please upload an image',
-          duration: 3,
-          style: { marginTop: '20vh' }
-        });
-      }
+    if (!imageFile) {
+      message.error({
+        content: '请上传图片',
+        duration: 3,
+        style: { marginTop: '20vh' }
+      });
       return;
     }
     
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeImageToVideo(prompt, imageFile);
+      // 如果prompt为空，使用默认文本或空字符串
+      const promptToUse = prompt.trim() || "生成视频";
+      const response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
           const newTask: Task = {
             id: taskId,
-            prompt: prompt.trim(),
+            prompt: promptToUse,
             createdAt: response.data.created_at as number * 1000,
-            status: response.data.status,
-            imageUrl: imagePreview || undefined
+            status: response.data.status
           };
           
           saveTasks([newTask, ...tasks]);
@@ -304,7 +295,7 @@ export default function ImageToVideoPage() {
             
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>✨</span>
-              <span>Prompt</span>
+              <span>Prompt (可选)</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
@@ -325,34 +316,27 @@ export default function ImageToVideoPage() {
                   <span className={styles.settingLabel}>Aspect Ratio</span>
                   <div className={styles.aspectRatioButtons}>
                     <Button
-                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._169)}
                       className={styles.aspectButton}
                     >
                       16:9
                     </Button>
                     <Button
-                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._916)}
                       className={styles.aspectButton}
                     >
                       9:16
                     </Button>
                     <Button
-                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._11)}
                       className={styles.aspectButton}
                     >
                       1:1
                     </Button>
                   </div>
-                </div>
-                <div className={styles.settingItem}>
-                  <span className={styles.settingLabel}>Prompt Optimization</span>
-                  <Switch
-                    checked={!disablePromptUpsampler}
-                    onChange={(checked) => setDisablePromptUpsampler(!checked)}
-                  />
                 </div>
               </div>
             </div>
@@ -360,13 +344,13 @@ export default function ImageToVideoPage() {
             <div className={styles.negativePromptSection}>
               <div className={styles.sectionTitle}>
                 <span className={styles.icon}>⛔</span>
-                <span>Negative Prompt (Optional)</span>
+                <span>Negative Prompt (可选)</span>
               </div>
               <div className={styles.inputWrapper}>
                 <TextArea
                   value={negativePrompt}
                   onChange={(e) => setNegativePrompt(e.target.value)}
-                  placeholder="Enter elements you don't want to see in the video"
+                  placeholder="输入您不希望在生成的视频中出现的元素"
                   className={styles.input}
                   disabled={loading}
                 />
@@ -375,11 +359,11 @@ export default function ImageToVideoPage() {
 
             <div className={styles.buttonGroup}>
               <Button
+                className={styles.generateButton}
                 type="primary"
                 onClick={handleGenerate}
                 loading={loading}
-                disabled={isPromptEmpty || isImageEmpty || loading}
-                className={styles.generateButton}
+                disabled={isImageEmpty || loading}
               >
                 Create
               </Button>
@@ -436,13 +420,13 @@ export default function ImageToVideoPage() {
           
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>
-            <span>Prompt</span>
+            <span>Prompt (可选)</span>
           </div>
           <div className={styles.inputWrapper}>
             <TextArea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
+              placeholder="输入文本描述您想要生成的内容。查看教程获取更好的效果。"
               className={styles.input}
               disabled={loading}
             />
@@ -458,34 +442,27 @@ export default function ImageToVideoPage() {
                 <span className={styles.settingLabel}>Aspect Ratio</span>
                 <div className={styles.aspectRatioButtons}>
                   <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._169)}
                     className={styles.aspectButton}
                   >
                     16:9
                   </Button>
                   <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._916)}
                     className={styles.aspectButton}
                   >
                     9:16
                   </Button>
                   <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._11)}
                     className={styles.aspectButton}
                   >
                     1:1
                   </Button>
                 </div>
-              </div>
-              <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>Prompt Optimization</span>
-                <Switch
-                  checked={!disablePromptUpsampler}
-                  onChange={(checked) => setDisablePromptUpsampler(!checked)}
-                />
               </div>
             </div>
           </div>
@@ -493,13 +470,13 @@ export default function ImageToVideoPage() {
           <div className={styles.negativePromptSection}>
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>⛔</span>
-              <span>Negative Prompt (Optional)</span>
+              <span>Negative Prompt (可选)</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="Enter elements you don't want to see in the video"
+                placeholder="输入您不希望在生成的视频中出现的元素"
                 className={styles.input}
                 disabled={loading}
               />
@@ -508,11 +485,11 @@ export default function ImageToVideoPage() {
 
           <div className={styles.buttonGroup}>
             <Button
+              className={styles.generateButton}
               type="primary"
               onClick={handleGenerate}
               loading={loading}
-              disabled={isPromptEmpty || isImageEmpty || loading}
-              className={styles.generateButton}
+              disabled={isImageEmpty || loading}
             >
               Create
             </Button>

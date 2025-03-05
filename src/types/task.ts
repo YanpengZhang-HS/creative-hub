@@ -7,5 +7,4 @@ export interface Task {
   status: TaskStatus;
   videoUrl?: string;
   error?: string;
-  imageUrl?: string;
 } 
