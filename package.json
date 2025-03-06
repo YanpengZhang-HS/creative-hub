@@ -6,15 +6,17 @@
     "export": "next export",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api-update": "./scripts/api-update.sh"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
     "@floating-ui/react-dom": "^2.1.1",
     "@mdx-js/loader": "^3.1.0",
     "@next/mdx": "^14.2.16",
+    "@openapitools/openapi-generator-cli": "^2.17.0",
     "antd": "^5.14.0",
-    "axios": "0.21.4",
+    "axios": "^1.8.1",
     "classnames": "^2.5.1",
     "cookie": "^1.0.1",
     "next": "^14.1.0",
@@ -25,7 +27,6 @@
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",
     "react-masonry-css": "^1.0.16",
-    "retry-axios": "2.4.0",
     "sass": "^1.77.6",
     "sharp": "^0.33.4"
   },
