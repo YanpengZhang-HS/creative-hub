@@ -163,7 +163,7 @@ export default function ImageToVideoPage() {
   const handleGenerate = async () => {
     if (!imageFile) {
       message.error({
-        content: '请上传图片',
+        content: 'Please upload an image',
         duration: 3,
         style: { marginTop: '20vh' }
       });
@@ -174,7 +174,7 @@ export default function ImageToVideoPage() {
 
     try {
       // 如果prompt为空，使用默认文本或空字符串
-      const promptToUse = prompt.trim() || "生成视频";
+      const promptToUse = prompt.trim() || "Generate video";
       const response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
       if (response.status === 200) {
         const taskId = response.data.task_id;
@@ -309,7 +309,7 @@ export default function ImageToVideoPage() {
             
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>✨</span>
-              <span>Prompt (可选)</span>
+              <span>Prompt (Optional)</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
@@ -358,13 +358,13 @@ export default function ImageToVideoPage() {
             <div className={styles.negativePromptSection}>
               <div className={styles.sectionTitle}>
                 <span className={styles.icon}>⛔</span>
-                <span>Negative Prompt (可选)</span>
+                <span>Negative Prompt (Optional)</span>
               </div>
               <div className={styles.inputWrapper}>
                 <TextArea
                   value={negativePrompt}
                   onChange={(e) => setNegativePrompt(e.target.value)}
-                  placeholder="输入您不希望在生成的视频中出现的元素"
+                  placeholder="Enter elements you don't want to appear in the generated video"
                   className={styles.input}
                   disabled={loading}
                 />
@@ -434,13 +434,13 @@ export default function ImageToVideoPage() {
           
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>
-            <span>Prompt (可选)</span>
+            <span>Prompt (Optional)</span>
           </div>
           <div className={styles.inputWrapper}>
             <TextArea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="输入文本描述您想要生成的内容。查看教程获取更好的效果。"
+              placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
               className={styles.input}
               disabled={loading}
             />
@@ -484,13 +484,13 @@ export default function ImageToVideoPage() {
           <div className={styles.negativePromptSection}>
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>⛔</span>
-              <span>Negative Prompt (可选)</span>
+              <span>Negative Prompt (Optional)</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="输入您不希望在生成的视频中出现的元素"
+                placeholder="Enter elements you don't want to appear in the generated video"
                 className={styles.input}
                 disabled={loading}
               />
