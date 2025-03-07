@@ -454,11 +454,14 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Create Text To Image Task
          * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {number} [height] 生成图片高度,必须是64的倍数
+         * @param {number} [width] 生成图片宽度,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToImage: async (prompt: string, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeTextToImage: async (prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeTextToImage', 'prompt', prompt)
             const localVarPath = `/api/v1/task/text_to_image`;
@@ -477,6 +480,18 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
             if (prompt !== undefined) { 
                 localVarFormParams.set('prompt', prompt as any);
+            }
+    
+            if (negitivePrompt !== undefined) { 
+                localVarFormParams.set('negitive_prompt', negitivePrompt as any);
+            }
+    
+            if (height !== undefined) { 
+                localVarFormParams.set('height', height as any);
+            }
+    
+            if (width !== undefined) { 
+                localVarFormParams.set('width', width as any);
             }
     
             if (mlPipeline !== undefined) { 
@@ -748,12 +763,15 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Create Text To Image Task
          * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {number} [height] 生成图片高度,必须是64的倍数
+         * @param {number} [width] 生成图片宽度,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeTextToImage(prompt: string, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeTextToImage(prompt, mlPipeline, options);
+        async invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeTextToImage']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -886,12 +904,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Create Text To Image Task
          * @param {string} prompt 
+         * @param {string} [negitivePrompt] 
+         * @param {number} [height] 生成图片高度,必须是64的倍数
+         * @param {number} [width] 生成图片宽度,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToImage(prompt: string, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
-            return localVarFp.invokeTextToImage(prompt, mlPipeline, options).then((request) => request(axios, basePath));
+        invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+            return localVarFp.invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1024,13 +1045,16 @@ export class DefaultApi extends BaseAPI {
      * 
      * @summary Create Text To Image Task
      * @param {string} prompt 
+     * @param {string} [negitivePrompt] 
+     * @param {number} [height] 生成图片高度,必须是64的倍数
+     * @param {number} [width] 生成图片宽度,必须是64的倍数
      * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeTextToImage(prompt: string, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).invokeTextToImage(prompt, mlPipeline, options).then((request) => request(this.axios, this.basePath));
+    public invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
