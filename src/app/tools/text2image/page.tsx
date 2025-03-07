@@ -17,9 +17,9 @@ const TOTAL_TIME = 20 ; // 20 minutes in seconds
 
 // Add this mapping at the top of the file
 const ASPECT_RATIO_DIMENSIONS = {
-  [InvokeTextToVideoAspectRatioEnum._169]: { width: 640, height: 360 },
+  [InvokeTextToVideoAspectRatioEnum._169]: { width: 1024, height: 576 },
   [InvokeTextToVideoAspectRatioEnum._11]: { width: 512, height: 512 },
-  [InvokeTextToVideoAspectRatioEnum._916]: { width: 360, height: 640 },
+  [InvokeTextToVideoAspectRatioEnum._916]: { width: 576, height: 1024 },
 } as const;
 
 interface TaskTimerStatus {
@@ -65,8 +65,8 @@ export default function TextToImagePage() {
   const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState('');
 
-  const [width, setWidth] = useState<number>(640);
-  const [height, setHeight] = useState<number>(360);
+  const [width, setWidth] = useState<number>(1024);
+  const [height, setHeight] = useState<number>(576);
 
     // Add this function to handle aspect ratio changes
     const handleAspectRatioChange = (newAspectRatio: InvokeTextToVideoAspectRatioEnum) => {
@@ -79,15 +79,18 @@ export default function TextToImagePage() {
   // 处理客户端初始化
   useEffect(() => {
     setIsClient(true);
-    const savedTasks = localStorage.getItem('image_tasks');
+    const savedTasks = localStorage.getItem('tasks');
 
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
-        setTasks(parsedTasks);
+        let filterTasks = parsedTasks.filter((task) => {
+          return  task.taskType === 'text_to_image';
+        });
+      
+        setTasks(filterTasks);
         // 恢复进行中任务的状态检查
-        parsedTasks.forEach((task: Task) => {
-          console.log("<<<", task)
+        filterTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -100,7 +103,7 @@ export default function TextToImagePage() {
 
   // 保存任务到 localStorage
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('image_tasks', JSON.stringify(newTasks));
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
     setTasks(newTasks);
   }, []);
 
@@ -110,7 +113,7 @@ export default function TextToImagePage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('image_tasks', JSON.stringify(newTasks));
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
       return newTasks;
     });
   }, []);
@@ -136,7 +139,6 @@ export default function TextToImagePage() {
 
         if (elapsed % 5 === 0) {
           backendApi.getTaskStatus(taskId).then((response) => {
-            console.log("<<<", response)
             if (response.status === 200) {
               if (response.data.status === TaskStatus.Completed) {
                 const imageUrl = API_CONFIG.getImageUrl(taskId);
@@ -175,8 +177,8 @@ export default function TextToImagePage() {
       const response = await backendApi.invokeTextToImage(
         prompt,
         negativePrompt || undefined,
-        width,
-        height
+        height,
+        width
       );
       if (response.status === 200) {
         const taskId = response.data.task_id;
