@@ -46,7 +46,7 @@ export const menuItems: MenuItem[] = [
   {
     key: '/creations',
     icon: <VideoCameraOutlined />,
-    label: 'Creations',
+    label: 'My Creations',
   },
 ];
 
