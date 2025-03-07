@@ -1,21 +1,6 @@
 import { InvokeTextToVideoAspectRatioEnum, InvokeImageToVideoAspectRatioEnum, TaskStatus } from "@/network/api";
 
-export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video' | 'text_to_image';
-
-export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
-  switch (taskType) {
-    case 'text_to_video':
-      return 'Text to Video';
-    case 'image_to_video':
-      return 'Iamge to Video';
-    case 'video_to_video':
-      return 'Video to Video';
-    default:
-      return '';
-  }
-};
-
-export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video';
+export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video' | 'text_to_image' | 'lip_sync';
 
 export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
   switch (taskType) {
@@ -25,6 +10,10 @@ export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
       return 'Image to Video';
     case 'video_to_video':
       return 'Video to Video';
+    case 'lip_sync':
+      return 'Lip Sync';
+    case 'text_to_image':
+      return 'Text to Image';
     default:
       return '';
   }
@@ -40,4 +29,4 @@ export interface Task {
   imageUrl?: string;
   error?: string;
   aspectRatio?: InvokeTextToVideoAspectRatioEnum | InvokeImageToVideoAspectRatioEnum;
-} 
+}

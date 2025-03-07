@@ -37,6 +37,10 @@ export const menuItems: MenuItem[] = [
         key: '/tools/image',
         label: 'Image to Video',
       },
+      {
+        key: '/tools/lipsync',
+        label: 'Lip Sync',
+      },
     ],
   },
   {
