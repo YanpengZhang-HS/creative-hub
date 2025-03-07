@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch, Upload } from 'antd';
+import { Button, Input, Progress, message, Switch, Upload, Spin } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -72,6 +72,8 @@ export default function ImageToVideoPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [textToImageTasks, setTextToImageTasks] = useState<Task[]>([]);
+  const [imageLoading, setImageLoading] = useState(false);
 
   // 处理客户端初始化
   useEffect(() => {
@@ -91,6 +93,27 @@ export default function ImageToVideoPage() {
         console.error('Failed to parse tasks:', error);
       }
     }
+    
+    // 加载Text to Image任务
+    const savedImageTasks = localStorage.getItem('image_tasks');
+    if (savedImageTasks) {
+      try {
+        const parsedImageTasks = JSON.parse(savedImageTasks);
+        // 只保留已完成且有图片URL的任务
+        const completedImageTasks = parsedImageTasks.filter(
+          (task: Task) => task.status === TaskStatus.Completed && task.imageUrl
+        );
+        setTextToImageTasks(completedImageTasks);
+      } catch (error) {
+        console.error('Failed to parse image tasks:', error);
+      }
+    }
+    
+    // 确保第一次进入页面时图片选择区域为空白状态
+    setImagePreview(null);
+    setImageFile(null);
+    // 清除选择的图片URL
+    localStorage.removeItem('selected_image_url');
   }, []);
 
   // 保存任务到 localStorage
@@ -161,9 +184,12 @@ export default function ImageToVideoPage() {
   }, [tasks, updateTaskStatus]);
 
   const handleGenerate = async () => {
-    if (!imageFile) {
+    // 检查是否有图片文件或者选择的图片URL
+    const selectedImageUrl = localStorage.getItem('selected_image_url');
+    
+    if (!imageFile && !imagePreview) {
       message.error({
-        content: 'Please upload an image',
+        content: 'Please upload or select an image',
         duration: 3,
         style: { marginTop: '20vh' }
       });
@@ -175,8 +201,50 @@ export default function ImageToVideoPage() {
     try {
       // 如果prompt为空，使用默认文本或空字符串
       const promptToUse = prompt.trim() || "Generate video";
-      const response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
-      if (response.status === 200) {
+      
+      let response;
+      
+      // 如果有图片文件，直接使用
+      if (imageFile) {
+        response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
+      } 
+      // 如果没有图片文件但有预览图片（从Text to Image选择的图片）
+      else if (imagePreview && selectedImageUrl) {
+        // 显示正在处理的消息
+        message.loading({
+          content: 'Processing selected image...',
+          key: 'imageProcessing'
+        });
+        
+        try {
+          // 尝试从URL下载图片并转换为File对象
+          const imgResponse = await fetch(selectedImageUrl);
+          const blob = await imgResponse.blob();
+          const file = new File([blob], 'image.png', { type: 'image/png' });
+          
+          // 使用下载的文件调用API
+          response = await backendApi.invokeImageToVideo(promptToUse, file, negativePrompt, aspectRatio);
+          
+          // 关闭处理消息
+          message.destroy('imageProcessing');
+        } catch (error) {
+          console.error('Error processing image:', error);
+          
+          // 关闭处理消息
+          message.destroy('imageProcessing');
+          
+          // 显示错误消息
+          message.error({
+            content: 'Failed to process the selected image. Please try uploading it manually.',
+            duration: 5,
+            style: { marginTop: '20vh' }
+          });
+          setLoading(false);
+          return;
+        }
+      }
+      
+      if (response && response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
           const newTask: Task = {
@@ -191,14 +259,18 @@ export default function ImageToVideoPage() {
           saveTasks([newTask, ...tasks]);
           checkTaskStatus(newTask);
           setPrompt('');
-          // 保留图片，方便用户继续使用相同图片创建新视频
+          // 清除选择的图片URL
+          localStorage.removeItem('selected_image_url');
+          
+          // 重置图片选择区域为空白状态
+          setImageFile(null);
+          setImagePreview(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
         }
       } else {
-        message.error({
-          content: 'Failed to generate video',
-          duration: 5,
-          style: { marginTop: '20vh' }
-        });
+        throw new Error('Failed to generate video');
       }
     } catch (error) {
       message.error({
@@ -274,13 +346,62 @@ export default function ImageToVideoPage() {
     e.stopPropagation(); // 阻止事件冒泡，避免触发上传
     setImageFile(null);
     setImagePreview(null);
+    // 清除localStorage中的图片URL
+    localStorage.removeItem('selected_image_url');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
+  // 处理点击Text to Image图片
+  const handleSelectTextToImageTask = (imageUrl: string) => {
+    // 设置loading状态
+    setImageLoading(true);
+    
+    // 创建一个Image对象来预加载图片
+    const img = document.createElement('img');
+    
+    // 图片加载完成后的处理
+    img.onload = () => {
+      // 图片加载完成，设置预览
+      setImagePreview(imageUrl);
+      
+      // 清除之前的文件选择，确保使用新选择的图片
+      setImageFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // 存储URL到localStorage
+      localStorage.setItem('selected_image_url', imageUrl);
+      
+      // 结束loading状态
+      setImageLoading(false);
+    };
+    
+    // 图片加载失败的处理
+    img.onerror = () => {
+      // 图片加载失败
+      console.error('Failed to load image');
+      message.error({
+        content: 'Failed to load image',
+        duration: 3,
+        style: { marginTop: '20vh' }
+      });
+      
+      // 清除预览，确保Create按钮保持禁用状态
+      setImagePreview(null);
+      
+      // 结束loading状态
+      setImageLoading(false);
+    };
+    
+    // 开始加载图片
+    img.src = imageUrl;
+  };
+
   const isPromptEmpty = !prompt.trim();
-  const isImageEmpty = !imageFile;
+  const isImageEmpty = !imageFile && !imagePreview;
 
   // 在渲染时检查是否是客户端
   if (!isClient) {
@@ -400,20 +521,28 @@ export default function ImageToVideoPage() {
             <span>Image</span>
           </div>
           <div className={styles.imageUploadSection}>
-            <div className={styles.uploadContainer} onClick={triggerImageUpload}>
+            <div className={styles.uploadContainer} onClick={imageLoading ? undefined : triggerImageUpload}>
               <input
                 type="file"
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 accept="image/*"
                 onChange={handleImageUpload}
-                disabled={loading}
+                disabled={loading || imageLoading}
               />
               {imagePreview ? (
                 <>
                   <img src={imagePreview} alt="Uploaded" className={styles.uploadedImage} />
+                  {imageLoading && (
+                    <div className={styles.uploadLoading}>
+                      <div>
+                        <Spin size="small" />
+                        <div className={styles.uploadLoadingText}>Loading image...</div>
+                      </div>
+                    </div>
+                  )}
                   <div className={styles.uploadOverlay}>
-                    <div className={styles.replaceButton}>Replace Image</div>
+                    <div className={styles.replaceButton}>{imageLoading ? "Loading..." : "Replace Image"}</div>
                   </div>
                   <Button
                     icon={<DeleteOutlined />}
@@ -431,6 +560,24 @@ export default function ImageToVideoPage() {
               )}
             </div>
           </div>
+          
+          {/* 添加Text to Image图片列表 */}
+          {textToImageTasks.length > 0 && (
+            <div className={styles.createdImagesSection}>
+              <div className={styles.createdImagesTitle}>From Creations</div>
+              <div className={styles.createdImagesList}>
+                {textToImageTasks.map(task => (
+                  <div 
+                    key={task.id} 
+                    className={styles.createdImageItem}
+                    onClick={() => handleSelectTextToImageTask(task.imageUrl!)}
+                  >
+                    <img src={task.imageUrl!} alt={task.prompt} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>

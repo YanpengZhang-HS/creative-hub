@@ -498,7 +498,8 @@
 .uploadedImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .uploadOverlay {
@@ -569,4 +570,94 @@
 
 .leftSection::-webkit-scrollbar-thumb:hover {
   background: #444;
+}
+
+.createdImagesSection {
+  margin-top: 16px;
+}
+
+.createdImagesTitle {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.createdImagesList {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2b2e #141414;
+}
+
+.createdImagesList::-webkit-scrollbar {
+  height: 6px;
+}
+
+.createdImagesList::-webkit-scrollbar-track {
+  background: #141414;
+  border-radius: 3px;
+}
+
+.createdImagesList::-webkit-scrollbar-thumb {
+  background-color: #2a2b2e;
+  border-radius: 3px;
+}
+
+.createdImageItem {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.createdImageItem:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.createdImageItem:hover::after {
+  content: "Use this image";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 10px;
+  padding: 4px;
+  text-align: center;
+}
+
+.createdImageItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadLoading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border-radius: 8px;
+}
+
+.uploadLoadingText {
+  color: white;
+  font-size: 12px;
+  margin-top: 8px;
+  text-align: center;
 } 
