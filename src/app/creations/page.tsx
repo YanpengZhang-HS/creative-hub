@@ -101,7 +101,7 @@ export default function CreationsPage() {
                       marginBottom: '16px'
                     }}
                   >
-                    {task.status === TaskStatus.Completed && task.videoUrl ? (
+                    {task.status === TaskStatus.Completed && task.videoUrl && (
                       <video
                         style={{
                           position: 'absolute',
@@ -116,17 +116,7 @@ export default function CreationsPage() {
                         controls
                         playsInline
                       />
-                    ) : task.status === TaskStatus.Failed ? (
-                      <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        textAlign: 'center'
-                      }}>
-                        <Text style={{ color: '#ff4d4f' }}>{task.error || 'Failed to generate video'}</Text>
-                      </div>
-                    ) : null}
+                    )}
                   </div>
                   <div>
                     <Text
