@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch, Upload } from 'antd';
+import { Button, Input, Progress, message, Switch } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -9,12 +9,11 @@ import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
-import { InvokeImageToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { RcFile, UploadFile } from 'antd/es/upload/interface';
+import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
+import { ReloadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
-const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
+const TOTAL_TIME = 20 ; // 20 minutes in seconds
 
 interface TaskTimerStatus {
   timer: NodeJS.Timeout;
@@ -34,55 +33,43 @@ const formatRemainingTime = (progress: number | undefined) => {
 };
 
 // 提取占位内容为组件以保持一致性
-const PlaceholderContent = ({ aspectRatio }: { aspectRatio: InvokeImageToVideoAspectRatioEnum }) => (
+const PlaceholderContent = () => (
   <div className={styles.taskList}>
-    <div className={styles.taskItem}>
-      <div className={styles.taskContent} data-aspect-ratio={
-        aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? "16:9" :
-        aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? "9:16" :
-        aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? "1:1" : "16:9"
-      }>
-        <div className={styles.placeholder}>
-          <Image
-            src="/create_guide.svg"
-            alt="Start Creating"
-            width={180}
-            height={180}
-            priority
-          />
-          <p>Create your first masterpiece!</p>
-        </div>
-      </div>
-      <div className={styles.taskInfo}>
-        <p className={styles.taskPrompt}>Upload an image and create amazing videos!</p>
-        <p className={styles.taskTime}>{new Date().toLocaleString()}</p>
-      </div>
+    <div className={styles.placeholder}>
+      <Image
+        src="/create_guide.svg"
+        alt="Start Creating"
+        width={240}
+        height={240}
+        priority
+      />
+      <p>Create your first masterpiece!</p>
     </div>
   </div>
 );
 
-export default function ImageToVideoPage() {
+export default function TextToImagePage() {
   const [prompt, setPrompt] = useState('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
-  const [aspectRatio, setAspectRatio] = useState<InvokeImageToVideoAspectRatioEnum>(InvokeImageToVideoAspectRatioEnum._169);
+  const [aspectRatio, setAspectRatio] = useState<InvokeTextToVideoAspectRatioEnum>(InvokeTextToVideoAspectRatioEnum._169);
+  const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 处理客户端初始化
   useEffect(() => {
     setIsClient(true);
-    const savedTasks = localStorage.getItem('i2v_tasks');
+    const savedTasks = localStorage.getItem('image_tasks');
+
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         setTasks(parsedTasks);
         // 恢复进行中任务的状态检查
         parsedTasks.forEach((task: Task) => {
+          console.log("<<<", task)
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -95,7 +82,7 @@ export default function ImageToVideoPage() {
 
   // 保存任务到 localStorage
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('i2v_tasks', JSON.stringify(newTasks));
+    localStorage.setItem('image_tasks', JSON.stringify(newTasks));
     setTasks(newTasks);
   }, []);
 
@@ -105,7 +92,7 @@ export default function ImageToVideoPage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('i2v_tasks', JSON.stringify(newTasks));
+      localStorage.setItem('image_tasks', JSON.stringify(newTasks));
       return newTasks;
     });
   }, []);
@@ -129,26 +116,27 @@ export default function ImageToVideoPage() {
         taskStatusRef.current[taskId].progress = percentage;
         updateTaskStatus(taskId, { status: TaskStatus.Processing });
 
-        if (elapsed % 60 === 0) {
+        if (elapsed % 5 === 0) {
           backendApi.getTaskStatus(taskId).then((response) => {
+            console.log("<<<", response)
             if (response.status === 200) {
               if (response.data.status === TaskStatus.Completed) {
-                const videoUrl = API_CONFIG.getVideoUrl(taskId);
+                const imageUrl = API_CONFIG.getImageUrl(taskId);
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Completed,
-                  videoUrl 
+                  imageUrl 
                 });
                 clearInterval(taskStatusRef.current[taskId].timer);
                 delete taskStatusRef.current[taskId];
               } else if (response.data.status === TaskStatus.Failed) {
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Failed,
-                  error: response.data.error || 'Failed to generate video'
+                  error: response.data.error || 'Failed to generate image'
                 });
                 clearInterval(taskStatusRef.current[taskId].timer);
                 delete taskStatusRef.current[taskId];
                 message.error({
-                  content: response.data.error || 'Failed to generate video',
+                  content: response.data.error || 'Failed to generate image',
                   duration: 5,
                   style: { marginTop: '20vh' }
                 });
@@ -161,48 +149,43 @@ export default function ImageToVideoPage() {
   }, [tasks, updateTaskStatus]);
 
   const handleGenerate = async () => {
-    if (!imageFile) {
-      message.error({
-        content: 'Please upload an image',
-        duration: 3,
-        style: { marginTop: '20vh' }
-      });
-      return;
-    }
+    if (!prompt.trim()) return;
     
     setLoading(true);
 
     try {
-      // 如果prompt为空，使用默认文本或空字符串
-      const promptToUse = prompt.trim() || "Generate video";
-      const response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
+      const response = await backendApi.invokeTextToImage(
+        prompt,
+        // comment these params as these are not supported yet
+        // negativePrompt || undefined,
+        // aspectRatio,
+        // disablePromptUpsampler
+      );
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
           const newTask: Task = {
             id: taskId,
-            taskType: 'image_to_video',
-            prompt: promptToUse,
+            prompt: prompt.trim(),
             createdAt: response.data.created_at as number * 1000,
             status: response.data.status,
-            aspectRatio: aspectRatio
+            taskType: 'text_to_image',
           };
           
           saveTasks([newTask, ...tasks]);
           checkTaskStatus(newTask);
           setPrompt('');
-          // 保留图片，方便用户继续使用相同图片创建新视频
         }
       } else {
         message.error({
-          content: 'Failed to generate video',
+          content: 'Failed to generate image',
           duration: 5,
           style: { marginTop: '20vh' }
         });
       }
     } catch (error) {
       message.error({
-        content: error instanceof Error ? error.message : 'Failed to generate video',
+        content: error instanceof Error ? error.message : 'Failed to generate image',
         duration: 5,
         style: { marginTop: '20vh' }
       });
@@ -230,57 +213,7 @@ export default function ImageToVideoPage() {
     setPrompt(hint);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      // 检查文件类型
-      if (!file.type.startsWith('image/')) {
-        message.error({
-          content: 'Please upload an image file',
-          duration: 3,
-          style: { marginTop: '20vh' }
-        });
-        return;
-      }
-      
-      // 检查文件大小（最大25MB）
-      if (file.size > 25 * 1024 * 1024) {
-        message.error({
-          content: 'Image size should be less than 25MB',
-          duration: 3,
-          style: { marginTop: '20vh' }
-        });
-        return;
-      }
-      
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const triggerImageUpload = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-  
-  // 添加删除图片功能
-  const handleDeleteImage = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 阻止事件冒泡，避免触发上传
-    setImageFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
   const isPromptEmpty = !prompt.trim();
-  const isImageEmpty = !imageFile;
 
   // 在渲染时检查是否是客户端
   if (!isClient) {
@@ -289,27 +222,8 @@ export default function ImageToVideoPage() {
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
             <div className={styles.sectionTitle}>
-              <span className={styles.icon}>🖼️</span>
-              <span>Image</span>
-            </div>
-            <div className={styles.imageUploadSection}>
-              <div className={styles.uploadContainer} onClick={triggerImageUpload}>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={loading}
-                />
-                <UploadOutlined className={styles.uploadIcon} />
-                <div className={styles.uploadText}>Click to upload an image</div>
-              </div>
-            </div>
-            
-            <div className={styles.sectionTitle}>
               <span className={styles.icon}>✨</span>
-              <span>Prompt (Optional)</span>
+              <span>Prompt</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
@@ -319,7 +233,25 @@ export default function ImageToVideoPage() {
                 disabled
               />
             </div>
-            
+            <div className={styles.hints}>
+              <div className={styles.hintTags}>
+                {samplePrompts.slice(0, 2).map((hint, index) => (
+                  <span 
+                    key={index}
+                    className={styles.hintTag}
+                    onClick={() => handleHintClick(hint)}
+                  >
+                    {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
+                  </span>
+                ))}
+                <Button
+                  type="text"
+                  icon={<ReloadOutlined />}
+                  onClick={handleRandomPrompt}
+                  className={styles.refreshButton}
+                />
+              </div>
+            </div>
             <div className={styles.settingsSection}>
               <div className={styles.sectionTitle}>
                 <span className={styles.icon}>⚙️</span>
@@ -330,27 +262,34 @@ export default function ImageToVideoPage() {
                   <span className={styles.settingLabel}>Aspect Ratio</span>
                   <div className={styles.aspectRatioButtons}>
                     <Button
-                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._169)}
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
                       className={styles.aspectButton}
                     >
                       16:9
                     </Button>
                     <Button
-                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._916)}
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
                       className={styles.aspectButton}
                     >
                       9:16
                     </Button>
                     <Button
-                      type={aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._11)}
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
                       className={styles.aspectButton}
                     >
                       1:1
                     </Button>
                   </div>
+                </div>
+                <div className={styles.settingItem}>
+                  <span className={styles.settingLabel}>Prompt Optimization</span>
+                  <Switch
+                    checked={!disablePromptUpsampler}
+                    onChange={(checked) => setDisablePromptUpsampler(!checked)}
+                  />
                 </div>
               </div>
             </div>
@@ -364,7 +303,7 @@ export default function ImageToVideoPage() {
                 <TextArea
                   value={negativePrompt}
                   onChange={(e) => setNegativePrompt(e.target.value)}
-                  placeholder="Enter elements you don't want to appear in the generated video"
+                  placeholder="Enter elements you don't want to see in the video"
                   className={styles.input}
                   disabled={loading}
                 />
@@ -373,18 +312,18 @@ export default function ImageToVideoPage() {
 
             <div className={styles.buttonGroup}>
               <Button
-                className={styles.generateButton}
                 type="primary"
                 onClick={handleGenerate}
                 loading={loading}
-                disabled={isImageEmpty || loading}
+                disabled={isPromptEmpty || loading}
+                className={styles.generateButton}
               >
                 Create
               </Button>
             </div>
           </div>
           <div className={styles.rightSection}>
-            <PlaceholderContent aspectRatio={aspectRatio} />
+            <PlaceholderContent />
           </div>
         </div>
       </div>
@@ -393,48 +332,22 @@ export default function ImageToVideoPage() {
 
   return (
     <div className={styles.pageContainer}>
+      {/* <div className={styles.header}>
+        <Button 
+          type="text"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => router.push('/')}
+          className={styles.backButton}
+        >
+          Back to Home
+        </Button>
+      </div> */}
+
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
           <div className={styles.sectionTitle}>
-            <span className={styles.icon}>🖼️</span>
-            <span>Image</span>
-          </div>
-          <div className={styles.imageUploadSection}>
-            <div className={styles.uploadContainer} onClick={triggerImageUpload}>
-              <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={loading}
-              />
-              {imagePreview ? (
-                <>
-                  <img src={imagePreview} alt="Uploaded" className={styles.uploadedImage} />
-                  <div className={styles.uploadOverlay}>
-                    <div className={styles.replaceButton}>Replace Image</div>
-                  </div>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    className={styles.deleteImageButton}
-                    onClick={handleDeleteImage}
-                    type="primary"
-                    danger
-                  />
-                </>
-              ) : (
-                <>
-                  <UploadOutlined className={styles.uploadIcon} />
-                  <div className={styles.uploadText}>Click to upload an image</div>
-                </>
-              )}
-            </div>
-          </div>
-          
-          <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>
-            <span>Prompt (Optional)</span>
+            <span>Prompt</span>
           </div>
           <div className={styles.inputWrapper}>
             <TextArea
@@ -445,7 +358,25 @@ export default function ImageToVideoPage() {
               disabled={loading}
             />
           </div>
-          
+          <div className={styles.hints}>
+            <div className={styles.hintTags}>
+              {samplePrompts.slice(0, 2).map((hint, index) => (
+                <span 
+                  key={index}
+                  className={styles.hintTag}
+                  onClick={() => handleHintClick(hint)}
+                >
+                  {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
+                </span>
+              ))}
+              <Button
+                type="text"
+                icon={<ReloadOutlined />}
+                onClick={handleRandomPrompt}
+                className={styles.refreshButton}
+              />
+            </div>
+          </div>
           <div className={styles.settingsSection}>
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>⚙️</span>
@@ -456,27 +387,34 @@ export default function ImageToVideoPage() {
                 <span className={styles.settingLabel}>Aspect Ratio</span>
                 <div className={styles.aspectRatioButtons}>
                   <Button
-                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._169)}
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
                     className={styles.aspectButton}
                   >
                     16:9
                   </Button>
                   <Button
-                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._916)}
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
                     className={styles.aspectButton}
                   >
                     9:16
                   </Button>
                   <Button
-                    type={aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeImageToVideoAspectRatioEnum._11)}
+                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
                     className={styles.aspectButton}
                   >
                     1:1
                   </Button>
                 </div>
+              </div>
+              <div className={styles.settingItem}>
+                <span className={styles.settingLabel}>Prompt Optimization</span>
+                <Switch
+                  checked={!disablePromptUpsampler}
+                  onChange={(checked) => setDisablePromptUpsampler(!checked)}
+                />
               </div>
             </div>
           </div>
@@ -490,7 +428,7 @@ export default function ImageToVideoPage() {
               <TextArea
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="Enter elements you don't want to appear in the generated video"
+                placeholder="Enter elements you don't want to see in the video"
                 className={styles.input}
                 disabled={loading}
               />
@@ -499,11 +437,11 @@ export default function ImageToVideoPage() {
 
           <div className={styles.buttonGroup}>
             <Button
-              className={styles.generateButton}
               type="primary"
               onClick={handleGenerate}
               loading={loading}
-              disabled={isImageEmpty || loading}
+              disabled={isPromptEmpty || loading}
+              className={styles.generateButton}
             >
               Create
             </Button>
@@ -515,11 +453,7 @@ export default function ImageToVideoPage() {
             <div className={styles.taskList}>
               {tasks.map(task => (
                 <div key={task.id} className={styles.taskItem}>
-                  <div className={styles.taskContent} data-aspect-ratio={
-                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._169 ? "16:9" :
-                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._916 ? "9:16" :
-                    task.aspectRatio === InvokeImageToVideoAspectRatioEnum._11 ? "1:1" : "16:9"
-                  }>
+                  <div className={styles.taskContent}>
                     {task.status === TaskStatus.Processing ? (
                       <div className={styles.progressContainer}>
                         <Progress 
@@ -531,16 +465,18 @@ export default function ImageToVideoPage() {
                             '100%': '#1677ff',
                           }}
                         />
-                        <p className={styles.progressText}>Generating video...</p>
+                        <p className={styles.progressText}>Generating image...</p>
                       </div>
-                    ) : task.status === TaskStatus.Completed && task.videoUrl ? (
-                      <video
-                        controls
-                        className={styles.video}
-                        src={task.videoUrl}
-                      >
-                        Your browser does not support video playback
-                      </video>
+                    ) : task.status === TaskStatus.Completed && task.imageUrl ? (
+                      <img
+                        src={task.imageUrl}
+                        alt="Start Creating"
+                        style={{
+                          width: 'auto',
+                          height: '100%',
+                          borderRadius: '8px'
+                        }}
+                        />
                     ) : task.status === TaskStatus.Failed ? (
                       <div className={styles.errorContainer}>
                         <p className={styles.errorText}>{task.error || 'Failed to generate video'}</p>
@@ -557,7 +493,7 @@ export default function ImageToVideoPage() {
               ))}
             </div>
           ) : (
-            <PlaceholderContent aspectRatio={aspectRatio} />
+            <PlaceholderContent />
           )}
         </div>
       </div>
