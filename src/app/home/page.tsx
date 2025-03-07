@@ -30,9 +30,9 @@ export default function Home() {
       link: "/tools/image"
     },
     {
-      title: "Effects",
+      title: "Lip Sync",
       description: "Powered by JioHotstar AI",
-      link: "/tools/effects"
+      link: "/tools/lipsync"
     }
   ];
 

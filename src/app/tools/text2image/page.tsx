@@ -15,6 +15,13 @@ import { ReloadOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
 const TOTAL_TIME = 20 ; // 20 minutes in seconds
 
+// Add this mapping at the top of the file
+const ASPECT_RATIO_DIMENSIONS = {
+  [InvokeTextToVideoAspectRatioEnum._169]: { width: 1024, height: 576 },
+  [InvokeTextToVideoAspectRatioEnum._11]: { width: 512, height: 512 },
+  [InvokeTextToVideoAspectRatioEnum._916]: { width: 576, height: 1024 },
+} as const;
+
 interface TaskTimerStatus {
   timer: NodeJS.Timeout;
   startTime: number;
@@ -58,18 +65,32 @@ export default function TextToImagePage() {
   const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState('');
 
+  const [width, setWidth] = useState<number>(1024);
+  const [height, setHeight] = useState<number>(576);
+
+    // Add this function to handle aspect ratio changes
+    const handleAspectRatioChange = (newAspectRatio: InvokeTextToVideoAspectRatioEnum) => {
+      const dimensions = ASPECT_RATIO_DIMENSIONS[newAspectRatio];
+      setWidth(dimensions.width);
+      setHeight(dimensions.height);
+      setAspectRatio(newAspectRatio);
+    };
+
   // 处理客户端初始化
   useEffect(() => {
     setIsClient(true);
-    const savedTasks = localStorage.getItem('image_tasks');
+    const savedTasks = localStorage.getItem('tasks');
 
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
-        setTasks(parsedTasks);
+        let filterTasks = parsedTasks.filter((task) => {
+          return  task.taskType === 'text_to_image';
+        });
+      
+        setTasks(filterTasks);
         // 恢复进行中任务的状态检查
-        parsedTasks.forEach((task: Task) => {
-          console.log("<<<", task)
+        filterTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -82,7 +103,7 @@ export default function TextToImagePage() {
 
   // 保存任务到 localStorage
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('image_tasks', JSON.stringify(newTasks));
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
     setTasks(newTasks);
   }, []);
 
@@ -92,7 +113,7 @@ export default function TextToImagePage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('image_tasks', JSON.stringify(newTasks));
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
       return newTasks;
     });
   }, []);
@@ -118,7 +139,6 @@ export default function TextToImagePage() {
 
         if (elapsed % 5 === 0) {
           backendApi.getTaskStatus(taskId).then((response) => {
-            console.log("<<<", response)
             if (response.status === 200) {
               if (response.data.status === TaskStatus.Completed) {
                 const imageUrl = API_CONFIG.getImageUrl(taskId);
@@ -156,10 +176,9 @@ export default function TextToImagePage() {
     try {
       const response = await backendApi.invokeTextToImage(
         prompt,
-        // comment these params as these are not supported yet
-        // negativePrompt || undefined,
-        // aspectRatio,
-        // disablePromptUpsampler
+        negativePrompt || undefined,
+        height,
+        width
       );
       if (response.status === 200) {
         const taskId = response.data.task_id;
@@ -263,33 +282,26 @@ export default function TextToImagePage() {
                   <div className={styles.aspectRatioButtons}>
                     <Button
                       type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                      onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._169)}
                       className={styles.aspectButton}
                     >
                       16:9
                     </Button>
                     <Button
                       type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                      onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._916)}
                       className={styles.aspectButton}
                     >
                       9:16
                     </Button>
                     <Button
                       type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                      onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._11)}
                       className={styles.aspectButton}
                     >
                       1:1
                     </Button>
                   </div>
-                </div>
-                <div className={styles.settingItem}>
-                  <span className={styles.settingLabel}>Prompt Optimization</span>
-                  <Switch
-                    checked={!disablePromptUpsampler}
-                    onChange={(checked) => setDisablePromptUpsampler(!checked)}
-                  />
                 </div>
               </div>
             </div>
@@ -388,33 +400,26 @@ export default function TextToImagePage() {
                 <div className={styles.aspectRatioButtons}>
                   <Button
                     type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                    onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._169)}
                     className={styles.aspectButton}
                   >
                     16:9
                   </Button>
                   <Button
                     type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                    onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._916)}
                     className={styles.aspectButton}
                   >
                     9:16
                   </Button>
                   <Button
                     type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                    onClick={() => handleAspectRatioChange(InvokeTextToVideoAspectRatioEnum._11)}
                     className={styles.aspectButton}
                   >
                     1:1
                   </Button>
                 </div>
-              </div>
-              <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>Prompt Optimization</span>
-                <Switch
-                  checked={!disablePromptUpsampler}
-                  onChange={(checked) => setDisablePromptUpsampler(!checked)}
-                />
               </div>
             </div>
           </div>
