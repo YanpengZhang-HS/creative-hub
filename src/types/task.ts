@@ -7,7 +7,7 @@ export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
     case 'text_to_video':
       return 'Text to Video';
     case 'image_to_video':
-      return 'Iamge to Video';
+      return 'Image to Video';
     case 'video_to_video':
       return 'Video to Video';
     default:
