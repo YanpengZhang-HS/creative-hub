@@ -57,7 +57,7 @@ export default function CreationsPage() {
         My Creations
       </Title>
       <Checkbox.Group
-        options={(['text_to_video',  'text_to_image', 'image_to_video',  'lip_sync'] as TaskType[]).map(taskType => ({
+        options={(['text_to_video',  'text_to_image', 'image_to_video',  'lip_sync', 'sound_effect'] as TaskType[]).map(taskType => ({
           label: getTaskTypeDisplayValue(taskType),
           value: taskType
         }))}

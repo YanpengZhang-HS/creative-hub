@@ -231,14 +231,14 @@ export default function SoundEffectPage() {
               <span>Prompt (Optional)</span>
             </div>
             <div className={styles.inputWrapper}>
-              <TextArea
-                value=""
-                placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
-                className={styles.input}
-                onChange={(e) => setPrompt(e.target.value)}
-                disabled={loading}
-              />
-            </div>
+            <TextArea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
+              className={styles.input}
+              disabled={loading}
+            />
+          </div>
 
           <div className={styles.buttonGroup}>
             <Button
