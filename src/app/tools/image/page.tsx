@@ -78,13 +78,17 @@ export default function ImageToVideoPage() {
   // 处理客户端初始化
   useEffect(() => {
     setIsClient(true);
-    const savedTasks = localStorage.getItem('i2v_tasks');
+    const savedTasks = localStorage.getItem('tasks');
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
-        setTasks(parsedTasks);
+        let filterTasks = parsedTasks.filter((task) => {
+          return  task.taskType === 'image_to_video';
+        });
+      
+        setTasks(filterTasks);
         // 恢复进行中任务的状态检查
-        parsedTasks.forEach((task: Task) => {
+        filterTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -95,12 +99,15 @@ export default function ImageToVideoPage() {
     }
     
     // 加载Text to Image任务
-    const savedImageTasks = localStorage.getItem('image_tasks');
+    const savedImageTasks = localStorage.getItem('tasks');
     if (savedImageTasks) {
       try {
         const parsedImageTasks = JSON.parse(savedImageTasks);
+        let filterTasks = parsedImageTasks.filter((task) => {
+          return  task.taskType === 'text_to_image';
+        });
         // 只保留已完成且有图片URL的任务
-        const completedImageTasks = parsedImageTasks.filter(
+        const completedImageTasks = filterTasks.filter(
           (task: Task) => task.status === TaskStatus.Completed && task.imageUrl
         );
         setTextToImageTasks(completedImageTasks);
@@ -118,7 +125,7 @@ export default function ImageToVideoPage() {
 
   // 保存任务到 localStorage
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('i2v_tasks', JSON.stringify(newTasks));
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
     setTasks(newTasks);
   }, []);
 
@@ -128,7 +135,7 @@ export default function ImageToVideoPage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('i2v_tasks', JSON.stringify(newTasks));
+      localStorage.setItem('tasks', JSON.stringify(newTasks));
       return newTasks;
     });
   }, []);

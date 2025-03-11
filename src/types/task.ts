@@ -1,6 +1,6 @@
 import { InvokeTextToVideoAspectRatioEnum, InvokeImageToVideoAspectRatioEnum, TaskStatus } from "@/network/api";
 
-export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video' | 'text_to_image' | 'lip_sync';
+export type TaskType = 'text_to_video' | 'image_to_video' | 'video_to_video' | 'text_to_image' | 'lip_sync' | 'sound_effect';
 
 export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
   switch (taskType) {
@@ -14,6 +14,8 @@ export const getTaskTypeDisplayValue = (taskType: TaskType): string => {
       return 'Lip Sync';
     case 'text_to_image':
       return 'Text to Image';
+    case 'sound_effect': 
+      return  'Sound Effect';
     default:
       return '';
   }

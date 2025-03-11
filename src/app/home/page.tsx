@@ -33,6 +33,11 @@ export default function Home() {
       title: "Lip Sync",
       description: "Powered by JioHotstar AI",
       link: "/tools/lipsync"
+    },
+    {
+      title: "Sound Effect",
+      description: "Powered by JioHotstar AI",
+      link: "/tools/soundeffect"
     }
   ];
 

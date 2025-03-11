@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Progress, message, Upload, Typography } from 'antd';
+import { Button, Input,  Progress, message, Upload, Typography } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -12,6 +12,7 @@ import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload/interface';
 
 const { Title, Text } = Typography;
+const { TextArea } = Input;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
 
 interface TaskTimerStatus {
@@ -40,17 +41,17 @@ const PlaceholderContent = () => (
         height={240}
         priority
       />
-      <p>Create your first lip sync video!</p>
+      <p>Create your first Sound Effect video!</p>
     </div>
   </div>
 );
 
-export default function LipSyncPage() {
+export default function SoundEffectPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [prompt, setPrompt] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -60,11 +61,11 @@ export default function LipSyncPage() {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         let filterTasks = parsedTasks.filter((task) => {
-          return  task.taskType === 'lip_sync';
+          return  task.taskType === 'sound_effect';
         });
       
         setTasks(filterTasks);
-        filterTasks.forEach((task: Task) => {
+        parsedTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }
@@ -141,7 +142,7 @@ export default function LipSyncPage() {
   }, [tasks, updateTaskStatus]);
 
   const handleGenerate = async () => {
-    if (!audioFile || !videoFile) {
+    if (!videoFile) {
       message.error('Please upload both audio and video files');
       return;
     }
@@ -149,14 +150,14 @@ export default function LipSyncPage() {
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeLipSync(audioFile, videoFile);
+      const response = await backendApi.invokeSoundEffect(prompt.trim() || "Generate Sound Effect", videoFile);
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
           const newTask: Task = {
             id: taskId,
-            taskType: 'lip_sync',
-            prompt: `Lip sync: ${videoFile.name} with ${audioFile.name}`,
+            taskType: 'sound_effect',
+            prompt: prompt.trim() || "Generate Sound Effect",
             createdAt: response.data.created_at as number * 1000,
             status: response.data.status
           };
@@ -173,18 +174,10 @@ export default function LipSyncPage() {
     }
   };
 
-  const handleAudioUpload = (file: RcFile) => {
-    setAudioFile(file);
-    return false;
-  };
 
   const handleVideoUpload = (file: RcFile) => {
     setVideoFile(file);
     return false;
-  };
-
-  const handleDeleteAudio = () => {
-    setAudioFile(null);
   };
 
   const handleDeleteVideo = () => {
@@ -193,49 +186,15 @@ export default function LipSyncPage() {
 
   if (!isClient) return null;
 
-  const isFilesEmpty = !audioFile || !videoFile;
+  const isFilesEmpty = !videoFile;
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
           <div className={styles.sectionTitle}>
-            <span className={styles.icon}>🎵</span>
-            <span>Audio File</span>
-          </div>
-          <div className={styles.uploadContainer}>
-            <Upload.Dragger
-              accept=".mp3"
-              beforeUpload={handleAudioUpload}
-              showUploadList={false}
-              disabled={loading}
-            >
-              {audioFile ? (
-                <>
-                  <div className={styles.uploadedFile}>{audioFile.name}</div>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteAudio();
-                    }}
-                    className={styles.deleteImageButton}
-                    type="primary"
-                    danger
-                  />
-                </>
-              ) : (
-                <>
-                  <UploadOutlined className={styles.uploadIcon} />
-                  <div className={styles.uploadText}>Click to upload MP3 audio</div>
-                </>
-              )}
-            </Upload.Dragger>
-          </div>
-
-          <div className={styles.sectionTitle}>
             <span className={styles.icon}>🎥</span>
-            <span>Video File</span>
+            <span>Video File(Up to 25M)</span>
           </div>
           <div className={styles.uploadContainer}>
             <Upload.Dragger
@@ -267,6 +226,20 @@ export default function LipSyncPage() {
             </Upload.Dragger>
           </div>
 
+          <div className={styles.sectionTitle}>
+              <span className={styles.icon}>✨</span>
+              <span>Prompt (Optional)</span>
+            </div>
+            <div className={styles.inputWrapper}>
+              <TextArea
+                value=""
+                placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
+                className={styles.input}
+                onChange={(e) => setPrompt(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
           <div className={styles.buttonGroup}>
             <Button
               type="primary"
@@ -297,7 +270,7 @@ export default function LipSyncPage() {
                             '100%': '#1677ff',
                           }}
                         />
-                        <p className={styles.progressText}>Processing lip sync...</p>
+                        <p className={styles.progressText}>Processing Sound Effect...</p>
                       </div>
                     ) : task.status === TaskStatus.Completed && task.videoUrl ? (
                       <video
@@ -309,7 +282,7 @@ export default function LipSyncPage() {
                       </video>
                     ) : task.status === TaskStatus.Failed ? (
                       <div className={styles.errorContainer}>
-                        <p className={styles.errorText}>{task.error || 'Failed to process lip sync'}</p>
+                        <p className={styles.errorText}>{task.error || 'Failed to process sound effect'}</p>
                       </div>
                     ) : null}
                   </div>
