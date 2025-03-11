@@ -65,9 +65,12 @@ export default function TextToVideoPage() {
     if (savedTasks) {
       try {
         const parsedTasks = JSON.parse(savedTasks);
-        setTasks(parsedTasks);
-        // 恢复进行中任务的状态检查
-        parsedTasks.forEach((task: Task) => {
+        let filterTasks = parsedTasks.filter((task) => {
+          return  task.taskType === 'text_to_video';
+        });
+      
+        setTasks(filterTasks);
+        filterTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
             checkTaskStatus(task);
           }

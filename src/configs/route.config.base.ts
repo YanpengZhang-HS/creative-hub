@@ -8,6 +8,7 @@ export const pathToKeys: Record<string, string[]> = {
   '/tools/text2image': ['/tools/text2image', 'tools'],
   '/tools/image': ['/tools/image', 'tools'],
   '/tools/lipsync': ['/tools/lipsync', 'tools'],
+  '/tools/soundeffect': ['/tools/soundeffect', 'tools'],
   '/creations': ['/creations'],
 };
 

@@ -315,7 +315,7 @@ export default function TextToImagePage() {
                 <TextArea
                   value={negativePrompt}
                   onChange={(e) => setNegativePrompt(e.target.value)}
-                  placeholder="Enter elements you don't want to see in the video"
+                  placeholder="Enter elements you don't want to see in the image"
                   className={styles.input}
                   disabled={loading}
                 />
@@ -433,7 +433,7 @@ export default function TextToImagePage() {
               <TextArea
                 value={negativePrompt}
                 onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="Enter elements you don't want to see in the video"
+                placeholder="Enter elements you don't want to see in the image"
                 className={styles.input}
                 disabled={loading}
               />
@@ -484,7 +484,7 @@ export default function TextToImagePage() {
                         />
                     ) : task.status === TaskStatus.Failed ? (
                       <div className={styles.errorContainer}>
-                        <p className={styles.errorText}>{task.error || 'Failed to generate video'}</p>
+                        <p className={styles.errorText}>{task.error || 'Failed to generate image'}</p>
                       </div>
                     ) : null}
                   </div>

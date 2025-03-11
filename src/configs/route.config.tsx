@@ -41,6 +41,10 @@ export const menuItems: MenuItem[] = [
         key: '/tools/lipsync',
         label: 'Lip Sync',
       },
+      {
+        key: '/tools/soundeffect',
+        label: 'Sound Effect',
+      },
     ],
   },
   {
