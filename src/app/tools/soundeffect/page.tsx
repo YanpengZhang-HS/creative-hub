@@ -77,7 +77,24 @@ export default function SoundEffectPage() {
   }, []);
 
   const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('tasks', JSON.stringify(newTasks));
+    const existingTasksStr = localStorage.getItem('tasks');
+    let allTasks: Task[] = [];
+    
+    if (existingTasksStr) {
+      try {
+        const existingTasks = JSON.parse(existingTasksStr);
+        // Filter out any tasks that would be duplicated by the new tasks
+        allTasks = existingTasks.filter((task: Task) => 
+          !newTasks.some(newTask => newTask.id === task.id)
+        );
+      } catch (error) {
+        console.error('Failed to parse existing tasks:', error);
+      }
+    }
+    
+    // Combine existing tasks with new tasks
+    const combinedTasks = [...newTasks, ...allTasks];
+    localStorage.setItem('tasks', JSON.stringify(combinedTasks));
     setTasks(newTasks);
   }, []);
 
@@ -86,7 +103,24 @@ export default function SoundEffectPage() {
       const newTasks = prevTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
       );
-      localStorage.setItem('tasks', JSON.stringify(newTasks));
+      const existingTasksStr = localStorage.getItem('tasks');
+      let allTasks: Task[] = [];
+      
+      if (existingTasksStr) {
+        try {
+          const existingTasks = JSON.parse(existingTasksStr);
+          // Filter out any tasks that would be duplicated by the new tasks
+          allTasks = existingTasks.filter((task: Task) => 
+            !newTasks.some(newTask => newTask.id === task.id)
+          );
+        } catch (error) {
+          console.error('Failed to parse existing tasks:', error);
+        }
+      }
+      
+      // Combine existing tasks with new tasks
+      const combinedTasks = [...newTasks, ...allTasks];
+      localStorage.setItem('tasks', JSON.stringify(combinedTasks));
       return newTasks;
     });
   }, []);
