@@ -14,7 +14,7 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
@@ -191,7 +191,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteTask: async (taskId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteTask: async (taskId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('deleteTask', 'taskId', taskId)
             const localVarPath = `/api/v1/tasks/{task_id}`
@@ -226,7 +226,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadTaskFile: async (taskId: string, filename: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        downloadTaskFile: async (taskId: string, filename: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('downloadTaskFile', 'taskId', taskId)
             // verify required parameter 'filename' is not null or undefined
@@ -263,7 +263,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTaskStatus: async (taskId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getTaskStatus: async (taskId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskId' is not null or undefined
             assertParamExists('getTaskStatus', 'taskId', taskId)
             const localVarPath = `/api/v1/tasks/{task_id}`
@@ -301,7 +301,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeImageToVideo: async (prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeImageToVideo: async (prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeImageToVideo', 'prompt', prompt)
             // verify required parameter 'imageFile' is not null or undefined
@@ -367,7 +367,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync: async (videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeLipSync: async (videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'videoFile' is not null or undefined
             assertParamExists('invokeLipSync', 'videoFile', videoFile)
             const localVarPath = `/api/v1/task/lip_sync`;
@@ -438,7 +438,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeSoundEffect: async (prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeSoundEffect: async (prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeSoundEffect', 'prompt', prompt)
             // verify required parameter 'videoFile' is not null or undefined
@@ -493,7 +493,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToImage: async (prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeTextToImage: async (prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeTextToImage', 'prompt', prompt)
             const localVarPath = `/api/v1/task/text_to_image`;
@@ -554,7 +554,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToVideo: async (prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeTextToVideo: async (prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeTextToVideo', 'prompt', prompt)
             const localVarPath = `/api/v1/task/text_to_video`;
@@ -613,7 +613,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeVideoToVideo: async (prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeVideoToVideo: async (prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'prompt' is not null or undefined
             assertParamExists('invokeVideoToVideo', 'prompt', prompt)
             // verify required parameter 'videoFile' is not null or undefined
@@ -664,7 +664,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTasks: async (status: TaskStatus, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listTasks: async (status: TaskStatus, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'status' is not null or undefined
             assertParamExists('listTasks', 'status', status)
             const localVarPath = `/api/v1/tasks`;
@@ -711,7 +711,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteTask(taskId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async deleteTask(taskId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTask(taskId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteTask']?.[localVarOperationServerIndex]?.url;
@@ -725,7 +725,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async downloadTaskFile(taskId: string, filename: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async downloadTaskFile(taskId: string, filename: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.downloadTaskFile(taskId, filename, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.downloadTaskFile']?.[localVarOperationServerIndex]?.url;
@@ -738,7 +738,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTaskStatus(taskId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async getTaskStatus(taskId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTaskStatus(taskId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTaskStatus']?.[localVarOperationServerIndex]?.url;
@@ -755,7 +755,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeImageToVideo(prompt, imageFile, negitivePrompt, aspectRatio, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeImageToVideo']?.[localVarOperationServerIndex]?.url;
@@ -775,7 +775,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeLipSync']?.[localVarOperationServerIndex]?.url;
@@ -790,7 +790,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeSoundEffect(prompt, videoFile, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeSoundEffect']?.[localVarOperationServerIndex]?.url;
@@ -807,7 +807,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeTextToImage']?.[localVarOperationServerIndex]?.url;
@@ -824,7 +824,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeTextToVideo(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeTextToVideo']?.[localVarOperationServerIndex]?.url;
@@ -839,7 +839,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+        async invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeVideoToVideo(prompt, videoFile, mlPipeline, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeVideoToVideo']?.[localVarOperationServerIndex]?.url;
@@ -852,7 +852,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listTasks(status: TaskStatus, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskListResponse>> {
+        async listTasks(status: TaskStatus, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskListResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listTasks(status, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTasks']?.[localVarOperationServerIndex]?.url;
@@ -875,7 +875,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteTask(taskId: string, options?: RawAxiosRequestConfig): AxiosPromise<any> {
+        deleteTask(taskId: string, options?: AxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.deleteTask(taskId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -886,7 +886,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        downloadTaskFile(taskId: string, filename: string, options?: RawAxiosRequestConfig): AxiosPromise<any> {
+        downloadTaskFile(taskId: string, filename: string, options?: AxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.downloadTaskFile(taskId, filename, options).then((request) => request(axios, basePath));
         },
         /**
@@ -896,7 +896,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTaskStatus(taskId: string, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        getTaskStatus(taskId: string, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.getTaskStatus(taskId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -910,7 +910,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeImageToVideo(prompt, imageFile, negitivePrompt, aspectRatio, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
@@ -927,7 +927,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(axios, basePath));
         },
         /**
@@ -939,7 +939,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeSoundEffect(prompt, videoFile, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
@@ -953,7 +953,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
@@ -967,7 +967,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeTextToVideo(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
@@ -979,7 +979,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+        invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig): AxiosPromise<TaskInfo> {
             return localVarFp.invokeVideoToVideo(prompt, videoFile, mlPipeline, options).then((request) => request(axios, basePath));
         },
         /**
@@ -989,7 +989,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listTasks(status: TaskStatus, options?: RawAxiosRequestConfig): AxiosPromise<TaskListResponse> {
+        listTasks(status: TaskStatus, options?: AxiosRequestConfig): AxiosPromise<TaskListResponse> {
             return localVarFp.listTasks(status, options).then((request) => request(axios, basePath));
         },
     };
@@ -1010,7 +1010,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deleteTask(taskId: string, options?: RawAxiosRequestConfig) {
+    public deleteTask(taskId: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteTask(taskId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1023,7 +1023,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public downloadTaskFile(taskId: string, filename: string, options?: RawAxiosRequestConfig) {
+    public downloadTaskFile(taskId: string, filename: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).downloadTaskFile(taskId, filename, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1035,7 +1035,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getTaskStatus(taskId: string, options?: RawAxiosRequestConfig) {
+    public getTaskStatus(taskId: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getTaskStatus(taskId, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1051,7 +1051,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+    public invokeImageToVideo(prompt: string, imageFile: File, negitivePrompt?: string, aspectRatio?: InvokeImageToVideoAspectRatioEnum, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeImageToVideo(prompt, imageFile, negitivePrompt, aspectRatio, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1070,7 +1070,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig) {
+    public invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1084,7 +1084,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+    public invokeSoundEffect(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeSoundEffect(prompt, videoFile, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1100,7 +1100,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+    public invokeTextToImage(prompt: string, negitivePrompt?: string, height?: number, width?: number, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeTextToImage(prompt, negitivePrompt, height, width, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1116,7 +1116,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+    public invokeTextToVideo(prompt: string, negitivePrompt?: string, aspectRatio?: InvokeTextToVideoAspectRatioEnum, disablePromptUpsampler?: boolean, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeTextToVideo(prompt, negitivePrompt, aspectRatio, disablePromptUpsampler, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1130,7 +1130,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
+    public invokeVideoToVideo(prompt: string, videoFile: File, mlPipeline?: MLPipelineEnum, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeVideoToVideo(prompt, videoFile, mlPipeline, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1142,7 +1142,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listTasks(status: TaskStatus, options?: RawAxiosRequestConfig) {
+    public listTasks(status: TaskStatus, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listTasks(status, options).then((request) => request(this.axios, this.basePath));
     }
 }

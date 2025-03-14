@@ -11,11 +11,11 @@ import type { Task } from '@/types/task';
 import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload/interface';
 
-const { Title, Text, TextArea } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const EMOTIONS = ["happy1", "happy2", "angry1", "angry2", "sad", "coquettish"];
-const LANGUAGES = ["Chinese", "English", "Korean", "Japanese"];
+const LANGUAGES = ["English", "Korean", "Japanese", "Chinese"];
 const SPEEDS = ["slow1", "slow2", "fast1", "fast2"];
 const SPEAKERS = ["Indian_women_1", "Indian_women_2"];
 
