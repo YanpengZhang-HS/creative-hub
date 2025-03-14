@@ -69,6 +69,7 @@ export default function LipSyncPage() {
   const [language, setLanguage] = useState(LANGUAGES[0]);
   const [speed, setSpeed] = useState(SPEEDS[0]);
   const [speaker, setSpeaker] = useState(SPEAKERS[0]);
+  const [cachedVideoTasks, setCachedVideoTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -77,8 +78,16 @@ export default function LipSyncPage() {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         let filterTasks = parsedTasks.filter((task) => {
-          return  task.taskType === 'lip_sync';
+          return task.taskType === 'lip_sync';
         });
+
+        // Get completed video tasks from cache
+        let videoTasks = parsedTasks.filter((task) => {
+          return (task.taskType === 'text_to_video' || task.taskType === 'image_to_video') && 
+                 task.status === TaskStatus.Completed;
+        });
+        
+        setCachedVideoTasks(videoTasks);
       
         setTasks(filterTasks);
         filterTasks.forEach((task: Task) => {
@@ -266,6 +275,22 @@ export default function LipSyncPage() {
     setVideoFile(null);
   };
 
+  const handleSelectCachedVideo = (videoUrl: string) => {
+    // Convert the URL to a File object
+    fetch(videoUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const filename = videoUrl.split('/').pop() || 'video.mp4';
+        const file = new File([blob], filename, { type: 'video/mp4' });
+        setVideoFile(file);
+      })
+      .catch(error => {
+        console.error('Error fetching video:', error);
+        message.error('Failed to load the selected video');
+      });
+  };
+
+
   if (!isClient) return null;
 
   const isInputEmpty = !videoFile || (inputType === 'audio' ? !audioFile : !prompt);
@@ -286,19 +311,23 @@ export default function LipSyncPage() {
               disabled={loading}
             >
               {videoFile ? (
-                <>
-                  <div className={styles.uploadedFile}>{videoFile.name}</div>
-                  <Button
+                <div className={styles.videoPreviewContainer}>
+                <video 
+                  className={styles.videoPreview}
+                  src={videoFile ? URL.createObjectURL(videoFile) : ''}
+                  controls
+                />
+                 <Button
                     icon={<DeleteOutlined />}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDeleteVideo();
                     }}
-                    className={styles.deleteImageButton}
+                    className={styles.topRightDeleteButton}
                     type="primary"
                     danger
                   />
-                </>
+              </div>
               ) : (
                 <>
                   <UploadOutlined className={styles.uploadIcon} />
@@ -307,6 +336,43 @@ export default function LipSyncPage() {
               )}
             </Upload.Dragger>
           </div>
+
+          {/* Cached videos section */}
+          {cachedVideoTasks.length > 0 && (
+            <div className={styles.cachedVideosSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>📚</span>
+                <span>Your Generated Videos</span>
+              </div>
+              <div className={styles.cachedVideosGrid}>
+                {cachedVideoTasks.map(task => (
+                  <div 
+                    key={task.id} 
+                    className={styles.cachedVideoItem}
+                    onClick={() => task.videoUrl && handleSelectCachedVideo(task.videoUrl)}
+                  >
+                    {task.videoUrl && (
+                      <video 
+                        className={styles.cachedVideoThumbnail}
+                        src={task.videoUrl}
+                        muted
+                        onMouseOver={e => (e.target as HTMLVideoElement).play()}
+                        onMouseOut={e => {
+                          const video = e.target as HTMLVideoElement;
+                          video.pause();
+                          video.currentTime = 0;
+                        }}
+                      />
+                    )}
+                    <div className={styles.cachedVideoInfo}>
+                      <p className={styles.cachedVideoType}>{task.prompt || 'Image to Video'}</p>
+                      <p className={styles.cachedVideoDate}>{new Date(task.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className={styles.sectionTitle} style={{ marginTop: '24px' }}>
             <span className={styles.icon}>🔊</span>
