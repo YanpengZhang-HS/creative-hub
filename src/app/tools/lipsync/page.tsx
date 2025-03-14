@@ -183,7 +183,7 @@ export default function LipSyncPage() {
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeLipSync(audioFile, videoFile);
+      const response = await backendApi.invokeLipSync(videoFile, undefined, audioFile);
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
