@@ -53,6 +53,7 @@ export default function SoundEffectPage() {
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
   const [prompt, setPrompt] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [cachedVideoTasks, setCachedVideoTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -61,9 +62,16 @@ export default function SoundEffectPage() {
       try {
         const parsedTasks = JSON.parse(savedTasks);
         let filterTasks = parsedTasks.filter((task) => {
-          return  task.taskType === 'sound_effect';
+          return task.taskType === 'sound_effect';
         });
-      
+        
+        // Get completed video tasks from cache
+        let videoTasks = parsedTasks.filter((task) => {
+          return (task.taskType === 'text_to_video' || task.taskType === 'image_to_video') && 
+                 task.status === TaskStatus.Completed;
+        });
+        
+        setCachedVideoTasks(videoTasks);
         setTasks(filterTasks);
         parsedTasks.forEach((task: Task) => {
           if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
@@ -218,6 +226,21 @@ export default function SoundEffectPage() {
     setVideoFile(null);
   };
 
+  const handleSelectCachedVideo = (videoUrl: string) => {
+    // Convert the URL to a File object
+    fetch(videoUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const filename = videoUrl.split('/').pop() || 'video.mp4';
+        const file = new File([blob], filename, { type: 'video/mp4' });
+        setVideoFile(file);
+      })
+      .catch(error => {
+        console.error('Error fetching video:', error);
+        message.error('Failed to load the selected video');
+      });
+  };
+
   if (!isClient) return null;
 
   const isFilesEmpty = !videoFile;
@@ -238,19 +261,23 @@ export default function SoundEffectPage() {
               disabled={loading}
             >
               {videoFile ? (
-                <>
-                  <div className={styles.uploadedFile}>{videoFile.name}</div>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteVideo();
-                    }}
-                    className={styles.deleteImageButton}
-                    type="primary"
-                    danger
+                <div className={styles.videoPreviewContainer}>
+                  <video 
+                    className={styles.videoPreview}
+                    src={videoFile ? URL.createObjectURL(videoFile) : ''}
+                    controls
                   />
-                </>
+                   <Button
+                      icon={<DeleteOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteVideo();
+                      }}
+                      className={styles.topRightDeleteButton}
+                      type="primary"
+                      danger
+                    />
+                </div>
               ) : (
                 <>
                   <UploadOutlined className={styles.uploadIcon} />
@@ -259,12 +286,50 @@ export default function SoundEffectPage() {
               )}
             </Upload.Dragger>
           </div>
+          
+          {/* Cached videos section */}
+          {cachedVideoTasks.length > 0 && (
+            <div className={styles.cachedVideosSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>📚</span>
+                <span>Your Generated Videos</span>
+              </div>
+              <div className={styles.cachedVideosGrid}>
+                {cachedVideoTasks.map(task => (
+                  <div 
+                    key={task.id} 
+                    className={styles.cachedVideoItem}
+                    onClick={() => task.videoUrl && handleSelectCachedVideo(task.videoUrl)}
+                  >
+                    {task.videoUrl && (
+                      <video 
+                        className={styles.cachedVideoThumbnail}
+                        src={task.videoUrl}
+                        muted
+                        onMouseOver={e => (e.target as HTMLVideoElement).play()}
+                        onMouseOut={e => {
+                          const video = e.target as HTMLVideoElement;
+                          video.pause();
+                          video.currentTime = 0;
+                        }}
+                      />
+                    )}
+                    <div className={styles.cachedVideoInfo}>
+                      <p className={styles.cachedVideoType}>{task.prompt || 'Image to Video'}</p>
+                      <p className={styles.cachedVideoDate}>{new Date(task.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className={styles.sectionTitle}>
-              <span className={styles.icon}>✨</span>
-              <span>Prompt (Optional)</span>
-            </div>
-            <div className={styles.inputWrapper}>
+            <span className={styles.icon}>✨</span>
+            <span>Prompt (Optional)</span>
+          </div>
+          
+          <div className={styles.inputWrapper}>
             <TextArea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -336,4 +401,4 @@ export default function SoundEffectPage() {
       </div>
     </div>
   );
-} 
+}
