@@ -569,4 +569,46 @@
 
 .leftSection::-webkit-scrollbar-thumb:hover {
   background: #444;
+}
+
+.radioGroup {
+  margin-bottom: 16px;
+}
+
+.textInputSection {
+  background: #1f1f1f;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.textInput {
+  margin-bottom: 16px;
+  background: #141414 !important;
+  border-color: #303030 !important;
+  color: white !important;
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.select {
+  width: 100%;
+}
+
+/* Wrap global styles within a local class */
+.textInputSection :global(.ant-select-selector) {
+  background: #141414 !important;
+  border-color: #303030 !important;
+}
+
+.textInputSection :global(.ant-select-selection-item) {
+  color: white !important;
+}
+
+.textInputSection :global(.ant-radio-wrapper) {
+  color: white !important;
 } 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Progress, message, Upload, Typography } from 'antd';
+import { Button, Progress, message, Upload, Typography, Radio, Select, Input } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -11,7 +11,14 @@ import type { Task } from '@/types/task';
 import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload/interface';
 
-const { Title, Text } = Typography;
+const { Title, Text, TextArea } = Typography;
+const { Option } = Select;
+
+const EMOTIONS = ["happy1", "happy2", "angry1", "angry2", "sad", "coquettish"];
+const LANGUAGES = ["Chinese", "English", "Korean", "Japanese"];
+const SPEEDS = ["slow1", "slow2", "fast1", "fast2"];
+const SPEAKERS = ["Indian_women_1", "Indian_women_2"];
+
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
 
 interface TaskTimerStatus {
@@ -50,8 +57,18 @@ export default function LipSyncPage() {
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  
+  // File states
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  
+  // Text-to-speech states
+  const [inputType, setInputType] = useState<'audio' | 'text'>('audio');
+  const [prompt, setPrompt] = useState('');
+  const [emotion, setEmotion] = useState(EMOTIONS[0]);
+  const [language, setLanguage] = useState(LANGUAGES[0]);
+  const [speed, setSpeed] = useState(SPEEDS[0]);
+  const [speaker, setSpeaker] = useState(SPEAKERS[0]);
 
   useEffect(() => {
     setIsClient(true);
@@ -175,22 +192,46 @@ export default function LipSyncPage() {
   }, [tasks, updateTaskStatus]);
 
   const handleGenerate = async () => {
-    if (!audioFile || !videoFile) {
-      message.error('Please upload both audio and video files');
+    if (!videoFile) {
+      message.error('Please upload a video file');
+      return;
+    }
+
+    if (inputType === 'audio' && !audioFile) {
+      message.error('Please upload an audio file');
+      return;
+    }
+
+    if (inputType === 'text' && !prompt) {
+      message.error('Please enter text for speech generation');
       return;
     }
     
     setLoading(true);
 
     try {
-      const response = await backendApi.invokeLipSync(videoFile, undefined, audioFile);
+      const response = await backendApi.invokeLipSync(
+        videoFile,
+        'bytedance_lip_sync_v1',
+        inputType === 'text' ? {
+          prompt,
+          emotion,
+          language,
+          speed,
+          speaker
+        } : undefined,
+        inputType === 'audio' ? audioFile : undefined
+      );
+
       if (response.status === 200) {
         const taskId = response.data.task_id;
         if (taskId) {
           const newTask: Task = {
             id: taskId,
             taskType: 'lip_sync',
-            prompt: `Lip sync: ${videoFile.name} with ${audioFile.name}`,
+            prompt: inputType === 'audio' 
+              ? `Lip sync: ${videoFile.name} with ${audioFile?.name}`
+              : `Lip sync: ${videoFile.name} with "${prompt}"`,
             createdAt: response.data.created_at as number * 1000,
             status: response.data.status
           };
@@ -227,46 +268,12 @@ export default function LipSyncPage() {
 
   if (!isClient) return null;
 
-  const isFilesEmpty = !audioFile || !videoFile;
+  const isInputEmpty = !videoFile || (inputType === 'audio' ? !audioFile : !prompt);
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
-          <div className={styles.sectionTitle}>
-            <span className={styles.icon}>🎵</span>
-            <span>Audio File</span>
-          </div>
-          <div className={styles.uploadContainer}>
-            <Upload.Dragger
-              accept=".mp3"
-              beforeUpload={handleAudioUpload}
-              showUploadList={false}
-              disabled={loading}
-            >
-              {audioFile ? (
-                <>
-                  <div className={styles.uploadedFile}>{audioFile.name}</div>
-                  <Button
-                    icon={<DeleteOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteAudio();
-                    }}
-                    className={styles.deleteImageButton}
-                    type="primary"
-                    danger
-                  />
-                </>
-              ) : (
-                <>
-                  <UploadOutlined className={styles.uploadIcon} />
-                  <div className={styles.uploadText}>Click to upload MP3 audio</div>
-                </>
-              )}
-            </Upload.Dragger>
-          </div>
-
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>🎥</span>
             <span>Video File</span>
@@ -301,12 +308,106 @@ export default function LipSyncPage() {
             </Upload.Dragger>
           </div>
 
+          <div className={styles.sectionTitle} style={{ marginTop: '24px' }}>
+            <span className={styles.icon}>🔊</span>
+            <span>Audio Source</span>
+          </div>
+          
+          <Radio.Group 
+            value={inputType} 
+            onChange={(e) => setInputType(e.target.value)}
+            className={styles.radioGroup}
+          >
+            <Radio value="audio">Upload Audio File</Radio>
+            <Radio value="text">Generate from Text</Radio>
+          </Radio.Group>
+
+          {inputType === 'audio' ? (
+            <div className={styles.uploadContainer}>
+              <Upload.Dragger
+                accept=".mp3"
+                beforeUpload={handleAudioUpload}
+                showUploadList={false}
+                disabled={loading}
+              >
+                {audioFile ? (
+                  <>
+                    <div className={styles.uploadedFile}>{audioFile.name}</div>
+                    <Button
+                      icon={<DeleteOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAudio();
+                      }}
+                      className={styles.deleteImageButton}
+                      type="primary"
+                      danger
+                    />
+                  </>
+                ) : (
+                  <>
+                    <UploadOutlined className={styles.uploadIcon} />
+                    <div className={styles.uploadText}>Click to upload MP3 audio</div>
+                  </>
+                )}
+              </Upload.Dragger>
+            </div>
+          ) : (
+            <div className={styles.textInputSection}>
+              <Input.TextArea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter text for speech generation"
+                rows={4}
+                className={styles.textInput}
+              />
+              <div className={styles.optionsGrid}>
+                <Select
+                  value={emotion}
+                  onChange={setEmotion}
+                  className={styles.select}
+                >
+                  {EMOTIONS.map(e => (
+                    <Option key={e} value={e}>{e}</Option>
+                  ))}
+                </Select>
+                <Select
+                  value={language}
+                  onChange={setLanguage}
+                  className={styles.select}
+                >
+                  {LANGUAGES.map(l => (
+                    <Option key={l} value={l}>{l}</Option>
+                  ))}
+                </Select>
+                <Select
+                  value={speed}
+                  onChange={setSpeed}
+                  className={styles.select}
+                >
+                  {SPEEDS.map(s => (
+                    <Option key={s} value={s}>{s}</Option>
+                  ))}
+                </Select>
+                <Select
+                  value={speaker}
+                  onChange={setSpeaker}
+                  className={styles.select}
+                >
+                  {SPEAKERS.map(s => (
+                    <Option key={s} value={s}>{s}</Option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+          )}
+
           <div className={styles.buttonGroup}>
             <Button
               type="primary"
               onClick={handleGenerate}
               loading={loading}
-              disabled={isFilesEmpty || loading}
+              disabled={isInputEmpty || loading}
               className={styles.generateButton}
             >
               Create
