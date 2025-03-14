@@ -111,7 +111,7 @@
   width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   background: #1a1b1e;
   border: 1px solid #2a2b2e;
   border-radius: 8px;
