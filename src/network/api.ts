@@ -43,13 +43,16 @@ export interface HTTPValidationError {
  */
 
 export const MLPipelineEnum = {
+    DummyMockFailureV1: 'dummy_mock_failure_v1',
     DummyMockOutputV1: 'dummy_mock_output_v1',
     CosmosTextToVideoV1: 'cosmos_text_to_video_v1',
     CosmosImageToVideoV1: 'cosmos_image_to_video_v1',
     CosmosVideoToVideoV1: 'cosmos_video_to_video_v1',
     BytedanceLipSyncV1: 'bytedance_lip_sync_v1',
     FluxTextToImageV1: 'flux_text_to_image_v1',
-    MmaudioSoundEffectV1: 'mmaudio_sound_effect_v1'
+    MmaudioSoundEffectV1: 'mmaudio_sound_effect_v1',
+    SkyreelsTextToVideoV1: 'skyreels_text_to_video_v1',
+    SkyreelsImageToVideoV1: 'skyreels_image_to_video_v1'
 } as const;
 
 export type MLPipelineEnum = typeof MLPipelineEnum[keyof typeof MLPipelineEnum];
@@ -103,6 +106,12 @@ export interface TaskInfo {
      * @memberof TaskInfo
      */
     'error'?: string | null;
+    /**
+     * 
+     * @type {object}
+     * @memberof TaskInfo
+     */
+    'error_detail'?: object | null;
 }
 
 
@@ -347,15 +356,18 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Create Lip Sync Task
-         * @param {File} audioFile mp3音频文件（最大25MB）
          * @param {File} videoFile mp4视频文件（最大25MB）
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {File} [audioFile] wav音频文件（最大25MB）
+         * @param {string} [prompt] 
+         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
+         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
+         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync: async (audioFile: File, videoFile: File, mlPipeline?: MLPipelineEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'audioFile' is not null or undefined
-            assertParamExists('invokeLipSync', 'audioFile', audioFile)
+        invokeLipSync: async (videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'videoFile' is not null or undefined
             assertParamExists('invokeLipSync', 'videoFile', videoFile)
             const localVarPath = `/api/v1/task/lip_sync`;
@@ -376,12 +388,32 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 localVarFormParams.append('ml_pipeline', mlPipeline as any);
             }
     
+            if (videoFile !== undefined) { 
+                localVarFormParams.append('video_file', videoFile as any);
+            }
+    
             if (audioFile !== undefined) { 
                 localVarFormParams.append('audio_file', audioFile as any);
             }
     
-            if (videoFile !== undefined) { 
-                localVarFormParams.append('video_file', videoFile as any);
+            if (prompt !== undefined) { 
+                localVarFormParams.append('prompt', prompt as any);
+            }
+    
+            if (emotion !== undefined) { 
+                localVarFormParams.append('emotion', emotion as any);
+            }
+    
+            if (language !== undefined) { 
+                localVarFormParams.append('language', language as any);
+            }
+    
+            if (speed !== undefined) { 
+                localVarFormParams.append('speed', speed as any);
+            }
+    
+            if (speaker !== undefined) { 
+                localVarFormParams.append('speaker', speaker as any);
             }
     
     
@@ -455,8 +487,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @summary Create Text To Image Task
          * @param {string} prompt 
          * @param {string} [negitivePrompt] 
-         * @param {number} [height] 生成图片高度,必须是64的倍数
-         * @param {number} [width] 生成图片宽度,必须是64的倍数
+         * @param {number} [height] 生成图片高度,最大值2048,必须是64的倍数,
+         * @param {number} [width] 生成图片宽度,最大值2048,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -732,14 +764,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create Lip Sync Task
-         * @param {File} audioFile mp3音频文件（最大25MB）
          * @param {File} videoFile mp4视频文件（最大25MB）
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {File} [audioFile] wav音频文件（最大25MB）
+         * @param {string} [prompt] 
+         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
+         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
+         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeLipSync(audioFile: File, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeLipSync(audioFile, videoFile, mlPipeline, options);
+        async invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeLipSync']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -764,8 +801,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @summary Create Text To Image Task
          * @param {string} prompt 
          * @param {string} [negitivePrompt] 
-         * @param {number} [height] 生成图片高度,必须是64的倍数
-         * @param {number} [width] 生成图片宽度,必须是64的倍数
+         * @param {number} [height] 生成图片高度,最大值2048,必须是64的倍数,
+         * @param {number} [width] 生成图片宽度,最大值2048,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -879,14 +916,19 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Create Lip Sync Task
-         * @param {File} audioFile mp3音频文件（最大25MB）
          * @param {File} videoFile mp4视频文件（最大25MB）
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+         * @param {File} [audioFile] wav音频文件（最大25MB）
+         * @param {string} [prompt] 
+         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
+         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
+         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync(audioFile: File, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
-            return localVarFp.invokeLipSync(audioFile, videoFile, mlPipeline, options).then((request) => request(axios, basePath));
+        invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+            return localVarFp.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -905,8 +947,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @summary Create Text To Image Task
          * @param {string} prompt 
          * @param {string} [negitivePrompt] 
-         * @param {number} [height] 生成图片高度,必须是64的倍数
-         * @param {number} [width] 生成图片宽度,必须是64的倍数
+         * @param {number} [height] 生成图片高度,最大值2048,必须是64的倍数,
+         * @param {number} [width] 生成图片宽度,最大值2048,必须是64的倍数
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1016,15 +1058,20 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Create Lip Sync Task
-     * @param {File} audioFile mp3音频文件（最大25MB）
      * @param {File} videoFile mp4视频文件（最大25MB）
      * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
+     * @param {File} [audioFile] wav音频文件（最大25MB）
+     * @param {string} [prompt] 
+     * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
+     * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
+     * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
+     * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeLipSync(audioFile: File, videoFile: File, mlPipeline?: MLPipelineEnum, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).invokeLipSync(audioFile, videoFile, mlPipeline, options).then((request) => request(this.axios, this.basePath));
+    public invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1046,8 +1093,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Create Text To Image Task
      * @param {string} prompt 
      * @param {string} [negitivePrompt] 
-     * @param {number} [height] 生成图片高度,必须是64的倍数
-     * @param {number} [width] 生成图片宽度,必须是64的倍数
+     * @param {number} [height] 生成图片高度,最大值2048,必须是64的倍数,
+     * @param {number} [width] 生成图片宽度,最大值2048,必须是64的倍数
      * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

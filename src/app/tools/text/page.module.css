@@ -111,7 +111,7 @@
   width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   background: #1a1b1e;
   border: 1px solid #2a2b2e;
   border-radius: 8px;
@@ -379,11 +379,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 12px;
+}
+
+.settingItem .sectionTitle {
+  min-width: 80px;
+  margin-bottom: 0;
 }
 
 .settingLabel {
-  color: #888;
   font-size: 14px;
+  color: #888;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -393,6 +399,50 @@
   color: #666;
   font-size: 14px;
   cursor: help;
+  margin-left: 4px;
+}
+
+.modelSelect {
+  margin-bottom: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.modelSelect :global(.ant-select-selector) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #2a2b2e !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+}
+
+.modelSelect :global(.ant-select-selection-item) {
+  color: #fff !important;
+  line-height: 38px !important;
+}
+
+.modelSelect :global(.ant-select-arrow) {
+  color: #666 !important;
+}
+
+.modelSelect :global(.ant-select-dropdown) {
+  background: #1f1f1f !important;
+  border: 1px solid #2a2b2e !important;
+}
+
+.modelSelect :global(.ant-select-item) {
+  color: #ccc !important;
+  padding: 8px 12px !important;
+  font-family: monospace !important;
+}
+
+.modelSelect :global(.ant-select-item-option-selected) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: #fff !important;
+}
+
+.modelSelect :global(.ant-select-item-option-active) {
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .tooltipWrapper :global(.ant-tooltip) {

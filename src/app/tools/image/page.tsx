@@ -1,10 +1,10 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch, Upload, Spin } from 'antd';
+import { Button, Input, Progress, message, Switch, Upload, Spin, Select } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
-import { TaskStatus } from '@/network/api';
+import { TaskStatus, MLPipelineEnum } from '@/network/api';
 import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
@@ -74,6 +74,7 @@ export default function ImageToVideoPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [textToImageTasks, setTextToImageTasks] = useState<Task[]>([]);
   const [imageLoading, setImageLoading] = useState(false);
+  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosImageToVideoV1);
 
   // 处理客户端初始化
   useEffect(() => {
@@ -213,7 +214,7 @@ export default function ImageToVideoPage() {
       
       // 如果有图片文件，直接使用
       if (imageFile) {
-        response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio);
+        response = await backendApi.invokeImageToVideo(promptToUse, imageFile, negativePrompt, aspectRatio, modelPipeline);
       } 
       // 如果没有图片文件但有预览图片（从Text to Image选择的图片）
       else if (imagePreview && selectedImageUrl) {
@@ -230,7 +231,7 @@ export default function ImageToVideoPage() {
           const file = new File([blob], 'image.png', { type: 'image/png' });
           
           // 使用下载的文件调用API
-          response = await backendApi.invokeImageToVideo(promptToUse, file, negativePrompt, aspectRatio);
+          response = await backendApi.invokeImageToVideo(promptToUse, file, negativePrompt, aspectRatio, modelPipeline);
           
           // 关闭处理消息
           message.destroy('imageProcessing');
@@ -416,6 +417,25 @@ export default function ImageToVideoPage() {
       <div className={styles.pageContainer}>
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
+            <div className={styles.settingItem}>
+              <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                <span className={styles.icon}>🤖</span>
+                <span>Model</span>
+              </div>
+              <Select
+                className={styles.modelSelect}
+                value={modelPipeline}
+                onChange={(value) => setModelPipeline(value)}
+                options={[
+                  { value: MLPipelineEnum.CosmosImageToVideoV1, label: MLPipelineEnum.CosmosImageToVideoV1 },
+                  { value: MLPipelineEnum.SkyreelsImageToVideoV1, label: MLPipelineEnum.SkyreelsImageToVideoV1 },
+                ]}
+                style={{ width: '70%' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}></div>
+
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>🖼️</span>
               <span>Image</span>
@@ -523,6 +543,25 @@ export default function ImageToVideoPage() {
     <div className={styles.pageContainer}>
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
+          <div className={styles.settingItem}>
+            <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+              <span className={styles.icon}>🤖</span>
+              <span>Model</span>
+            </div>
+            <Select
+              className={styles.modelSelect}
+              value={modelPipeline}
+              onChange={(value) => setModelPipeline(value)}
+              options={[
+                { value: MLPipelineEnum.CosmosImageToVideoV1, label: MLPipelineEnum.CosmosImageToVideoV1 },
+                { value: MLPipelineEnum.SkyreelsImageToVideoV1, label: MLPipelineEnum.SkyreelsImageToVideoV1 },
+              ]}
+              style={{ width: '70%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}></div>
+
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>🖼️</span>
             <span>Image</span>
