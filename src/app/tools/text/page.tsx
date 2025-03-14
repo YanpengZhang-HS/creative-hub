@@ -1,10 +1,10 @@
 "use client";
 
-import { Button, Input, Progress, message, Switch, Tooltip } from 'antd';
+import { Button, Input, Progress, message, Switch, Tooltip, Select } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
-import { TaskStatus } from '@/network/api';
+import { TaskStatus, MLPipelineEnum } from '@/network/api';
 import { samplePrompts } from '@/configs/prompt.config';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
@@ -13,6 +13,7 @@ import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
 import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
+const { Option } = Select;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
 
 interface TaskTimerStatus {
@@ -57,6 +58,7 @@ export default function TextToVideoPage() {
   const [aspectRatio, setAspectRatio] = useState<InvokeTextToVideoAspectRatioEnum>(InvokeTextToVideoAspectRatioEnum._169);
   const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState('');
+  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosTextToVideoV1);
 
   // 处理客户端初始化
   useEffect(() => {
@@ -158,7 +160,8 @@ export default function TextToVideoPage() {
         prompt,
         negativePrompt || undefined,
         aspectRatio,
-        disablePromptUpsampler
+        disablePromptUpsampler,
+        modelPipeline
       );
       if (response.status === 200) {
         const taskId = response.data.task_id;
@@ -221,6 +224,21 @@ export default function TextToVideoPage() {
       <div className={styles.pageContainer}>
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
+            <div className={styles.sectionTitle}>
+              <span className={styles.icon}>🤖</span>
+              <span>Model</span>
+            </div>
+            <div>
+              <Select
+                value={MLPipelineEnum.CosmosTextToVideoV1}
+                className={styles.modelSelect}
+                disabled
+                style={{ width: '100%' }}
+              >
+                <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
+              </Select>
+            </div>
+
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>✨</span>
               <span>Prompt</span>
@@ -350,6 +368,23 @@ export default function TextToVideoPage() {
 
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
+          <div className={styles.sectionTitle}>
+            <span className={styles.icon}>🤖</span>
+            <span>Model</span>
+          </div>
+          <div>
+            <Select
+              value={modelPipeline}
+              onChange={(value: MLPipelineEnum) => setModelPipeline(value)}
+              className={styles.modelSelect}
+              disabled={loading}
+              style={{ width: '100%' }}
+            >
+              <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
+              <Option value={MLPipelineEnum.SkyreelsTextToVideoV1}>{MLPipelineEnum.SkyreelsTextToVideoV1}</Option>
+            </Select>
+          </div>
+
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>
             <span>Prompt</span>
