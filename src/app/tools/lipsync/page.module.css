@@ -467,6 +467,8 @@
 .uploadContainer {
   width: 100%;
   height: 180px;
+  min-height: 180px;
+  flex-shrink: 0;
   border: 1px dashed #2a2b2e;
   border-radius: 8px;
   display: flex;
@@ -576,10 +578,24 @@
 }
 
 .textInputSection {
-  background: #1f1f1f;
+  background: #292b31;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
+}
+
+.inputGroup,
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.inputLabel {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .textInput {
@@ -592,7 +608,7 @@
 .optionsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 16px;
 }
 
 .select {

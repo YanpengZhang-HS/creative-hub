@@ -222,14 +222,12 @@ export default function LipSyncPage() {
       const response = await backendApi.invokeLipSync(
         videoFile,
         'bytedance_lip_sync_v1',
-        inputType === 'text' ? {
-          prompt,
-          emotion,
-          language,
-          speed,
-          speaker
-        } : undefined,
-        inputType === 'audio' ? audioFile : undefined
+        inputType === 'audio' && audioFile ? audioFile : undefined,
+        inputType === 'text' ? prompt : undefined,
+        inputType === 'text' ? emotion : undefined,
+        inputType === 'text' ? language : undefined,
+        inputType === 'text' ? speed : undefined,
+        inputType === 'text' ? speaker : undefined
       );
 
       if (response.status === 200) {
@@ -420,50 +418,65 @@ export default function LipSyncPage() {
             </div>
           ) : (
             <div className={styles.textInputSection}>
-              <Input.TextArea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter text for speech generation"
-                rows={4}
-                className={styles.textInput}
-              />
+              <div className={styles.inputGroup}>
+                <div className={styles.inputLabel}>Prompt</div>
+                <Input.TextArea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Enter text for speech generation"
+                  rows={4}
+                  className={styles.textInput}
+                />
+              </div>
               <div className={styles.optionsGrid}>
-                <Select
-                  value={emotion}
-                  onChange={setEmotion}
-                  className={styles.select}
-                >
-                  {EMOTIONS.map(e => (
-                    <Option key={e} value={e}>{e}</Option>
-                  ))}
-                </Select>
-                <Select
-                  value={language}
-                  onChange={setLanguage}
-                  className={styles.select}
-                >
-                  {LANGUAGES.map(l => (
-                    <Option key={l} value={l}>{l}</Option>
-                  ))}
-                </Select>
-                <Select
-                  value={speed}
-                  onChange={setSpeed}
-                  className={styles.select}
-                >
-                  {SPEEDS.map(s => (
-                    <Option key={s} value={s}>{s}</Option>
-                  ))}
-                </Select>
-                <Select
-                  value={speaker}
-                  onChange={setSpeaker}
-                  className={styles.select}
-                >
-                  {SPEAKERS.map(s => (
-                    <Option key={s} value={s}>{s}</Option>
-                  ))}
-                </Select>
+                <div className={styles.selectGroup}>
+                  <div className={styles.inputLabel}>Emotion</div>
+                  <Select
+                    value={emotion}
+                    onChange={setEmotion}
+                    className={styles.select}
+                  >
+                    {EMOTIONS.map(e => (
+                      <Option key={e} value={e}>{e}</Option>
+                    ))}
+                  </Select>
+                </div>
+                <div className={styles.selectGroup}>
+                  <div className={styles.inputLabel}>Language</div>
+                  <Select
+                    value={language}
+                    onChange={setLanguage}
+                    className={styles.select}
+                  >
+                    {LANGUAGES.map(l => (
+                      <Option key={l} value={l}>{l}</Option>
+                    ))}
+                  </Select>
+                </div>
+                <div className={styles.selectGroup}>
+                  <div className={styles.inputLabel}>Speed</div>
+                  <Select
+                    value={speed}
+                    onChange={setSpeed}
+                    className={styles.select}
+                  >
+                    {SPEEDS.map(s => (
+                      <Option key={s} value={s}>{s}</Option>
+                    ))}
+                  </Select>
+                </div>
+                <div className={styles.selectGroup}>
+                  <div className={styles.inputLabel}>Speaker</div>
+                  <Select
+                    value={speaker}
+                    onChange={setSpeaker}
+                    className={styles.select}
+                  >
+                    {SPEAKERS.map(s => (
+                      <Option key={s} value={s}>{s}</Option>
+                    ))}
+                  </Select>
+                </div>
               </div>
             </div>
           )}
