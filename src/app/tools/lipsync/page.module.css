@@ -118,7 +118,7 @@
   border-radius: 8px;
   padding: 24px;
   overflow-y: auto;
-  max-height: calc(100vh - 48px);
+  height: calc(100vh - 48px);
 }
 
 .rightSection {
@@ -466,6 +466,8 @@
 
 .uploadContainer {
   width: 100%;
+  position: relative;
+  margin-bottom: 20px;
   height: 180px;
   min-height: 180px;
   flex-shrink: 0;
@@ -480,7 +482,6 @@
   transition: all 0.3s;
   background: rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  position: relative;
 }
 
 .uploadContainer:hover {
@@ -696,22 +697,24 @@
   width: 100%;
   position: relative;
   padding-top: 8px;
+  height: 180px;
+  flex-shrink: 0;
 }
 
 .videoPreview {
   width: 100%;
-  max-height: 180px;
+  height: 180px;
   object-fit: contain;
   border-radius: 4px;
   background-color: #000;
 }
 
-.uploadContainer {
+/* .uploadContainer {
   position: relative;
   margin-bottom: 20px;
   height: auto;
   min-height: 180px;
-}
+} */
 
 .uploadedFileInfo {
   display: flex;
