@@ -378,12 +378,13 @@
 .settingItem {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .settingItem .sectionTitle {
   min-width: 80px;
+  margin-bottom: 0;
 }
 
 .settingLabel {
@@ -404,6 +405,8 @@
 .modelSelect {
   margin-bottom: 0;
   text-align: left;
+  display: flex;
+  align-items: center;
 }
 
 .modelSelect :global(.ant-select-selector) {
