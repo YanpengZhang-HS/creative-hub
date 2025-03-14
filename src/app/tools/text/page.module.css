@@ -382,6 +382,10 @@
   margin-bottom: 16px;
 }
 
+.settingItem .sectionTitle {
+  min-width: 80px;
+}
+
 .settingLabel {
   font-size: 14px;
   color: #888;
@@ -398,8 +402,8 @@
 }
 
 .modelSelect {
-  width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 0;
+  text-align: left;
 }
 
 .modelSelect :global(.ant-select-selector) {

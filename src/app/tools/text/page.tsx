@@ -224,20 +224,24 @@ export default function TextToVideoPage() {
       <div className={styles.pageContainer}>
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
-            <div className={styles.sectionTitle}>
-              <span className={styles.icon}>🤖</span>
-              <span>Model</span>
-            </div>
-            <div>
+            <div className={styles.settingItem}>
+              <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                <span className={styles.icon}>🤖</span>
+                <span>Model</span>
+              </div>
               <Select
-                value={MLPipelineEnum.CosmosTextToVideoV1}
+                value={modelPipeline}
+                onChange={(value: MLPipelineEnum) => setModelPipeline(value)}
                 className={styles.modelSelect}
-                disabled
-                style={{ width: '100%' }}
+                disabled={loading}
+                style={{ width: '70%' }}
               >
                 <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
+                <Option value={MLPipelineEnum.SkyreelsTextToVideoV1}>{MLPipelineEnum.SkyreelsTextToVideoV1}</Option>
               </Select>
             </div>
+
+            <div style={{ marginBottom: '16px' }}></div>
 
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>✨</span>
@@ -368,183 +372,186 @@ export default function TextToVideoPage() {
 
       <div className={styles.mainContent}>
         <div className={styles.leftSection}>
-          <div className={styles.sectionTitle}>
-            <span className={styles.icon}>🤖</span>
-            <span>Model</span>
-          </div>
-          <div>
+          <div className={styles.settingItem}>
+            <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+              <span className={styles.icon}>🤖</span>
+              <span>Model</span>
+            </div>
             <Select
               value={modelPipeline}
               onChange={(value: MLPipelineEnum) => setModelPipeline(value)}
               className={styles.modelSelect}
               disabled={loading}
-              style={{ width: '100%' }}
+              style={{ width: '70%' }}
             >
               <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
               <Option value={MLPipelineEnum.SkyreelsTextToVideoV1}>{MLPipelineEnum.SkyreelsTextToVideoV1}</Option>
             </Select>
           </div>
 
-          <div className={styles.sectionTitle}>
-            <span className={styles.icon}>✨</span>
-            <span>Prompt</span>
-          </div>
-          <div className={styles.inputWrapper}>
-            <TextArea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
-              className={styles.input}
-              disabled={loading}
-            />
-          </div>
-          <div className={styles.hints}>
-            <div className={styles.hintTags}>
-              {samplePrompts.slice(0, 2).map((hint, index) => (
-                <span 
-                  key={index}
-                  className={styles.hintTag}
-                  onClick={() => handleHintClick(hint)}
-                >
-                  {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
-                </span>
-              ))}
-              <Button
-                type="text"
-                icon={<ReloadOutlined />}
-                onClick={handleRandomPrompt}
-                className={styles.refreshButton}
-              />
-            </div>
-          </div>
-          <div className={styles.settingsSection}>
-            <div className={styles.sectionTitle}>
-              <span className={styles.icon}>⚙️</span>
-              <span>Settings</span>
-            </div>
-            <div className={styles.settingsContent}>
-              <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>Aspect Ratio</span>
-                <div className={styles.aspectRatioButtons}>
-                  <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
-                    className={styles.aspectButton}
-                  >
-                    16:9
-                  </Button>
-                  <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
-                    className={styles.aspectButton}
-                  >
-                    9:16
-                  </Button>
-                  <Button
-                    type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
-                    onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
-                    className={styles.aspectButton}
-                  >
-                    1:1
-                  </Button>
-                </div>
-              </div>
-              <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>
-                  Prompt Optimization
-                  <Tooltip title="Enable prompt upsampler with LLM">
-                    <InfoCircleOutlined />
-                  </Tooltip>
-                </span>
-                <Switch
-                  checked={!disablePromptUpsampler}
-                  onChange={(checked) => setDisablePromptUpsampler(!checked)}
-                />
-              </div>
-            </div>
-          </div>
+            <div style={{ marginBottom: '16px' }}></div>
 
-          <div className={styles.negativePromptSection}>
             <div className={styles.sectionTitle}>
-              <span className={styles.icon}>⛔</span>
-              <span>Negative Prompt (Optional)</span>
+              <span className={styles.icon}>✨</span>
+              <span>Prompt</span>
             </div>
             <div className={styles.inputWrapper}>
               <TextArea
-                value={negativePrompt}
-                onChange={(e) => setNegativePrompt(e.target.value)}
-                placeholder="Enter elements you don't want to see in the video"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
                 className={styles.input}
                 disabled={loading}
               />
             </div>
-          </div>
-
-          <div className={styles.buttonGroup}>
-            <Button
-              type="primary"
-              onClick={handleGenerate}
-              loading={loading}
-              disabled={isPromptEmpty || loading}
-              className={styles.generateButton}
-            >
-              Create
-            </Button>
-          </div>
-        </div>
-
-        <div className={styles.rightSection}>
-          {tasks.length > 0 ? (
-            <div className={styles.taskList}>
-              {tasks.map(task => (
-                <div key={task.id} className={styles.taskItem}>
-                  <div 
-                    className={styles.taskContent}
-                    data-aspect-ratio={
-                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? "1:1" :
-                      task.aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? "9:16" :
-                      "16:9"
-                    }
+            <div className={styles.hints}>
+              <div className={styles.hintTags}>
+                {samplePrompts.slice(0, 2).map((hint, index) => (
+                  <span 
+                    key={index}
+                    className={styles.hintTag}
+                    onClick={() => handleHintClick(hint)}
                   >
-                    {task.status === TaskStatus.Processing ? (
-                      <div className={styles.progressContainer}>
-                        <Progress 
-                          type="circle" 
-                          percent={taskStatusRef.current[task.id]?.progress || 0}
-                          format={(percent) => formatRemainingTime(percent)}
-                          strokeColor={{
-                            '0%': '#1668dc',
-                            '100%': '#1677ff',
-                          }}
-                        />
-                        <p className={styles.progressText}>Generating video...</p>
-                      </div>
-                    ) : task.status === TaskStatus.Completed && task.videoUrl ? (
-                      <video
-                        controls
-                        className={styles.video}
-                        src={task.videoUrl}
-                      >
-                        Your browser does not support video playback
-                      </video>
-                    ) : task.status === TaskStatus.Failed ? (
-                      <div className={styles.errorContainer}>
-                        <p className={styles.errorText}>{task.error || 'Failed to generate video'}</p>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className={styles.taskInfo}>
-                    <p className={styles.taskPrompt}>{task.prompt}</p>
-                    <p className={styles.taskTime}>
-                      {new Date(task.createdAt).toLocaleString()}
-                    </p>
+                    {hint.split('.')[0].split(' ').slice(0, 3).join(' ')}
+                  </span>
+                ))}
+                <Button
+                  type="text"
+                  icon={<ReloadOutlined />}
+                  onClick={handleRandomPrompt}
+                  className={styles.refreshButton}
+                />
+              </div>
+            </div>
+            <div className={styles.settingsSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>⚙️</span>
+                <span>Settings</span>
+              </div>
+              <div className={styles.settingsContent}>
+                <div className={styles.settingItem}>
+                  <span className={styles.settingLabel}>Aspect Ratio</span>
+                  <div className={styles.aspectRatioButtons}>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._169 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._169)}
+                      className={styles.aspectButton}
+                    >
+                      16:9
+                    </Button>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._916)}
+                      className={styles.aspectButton}
+                    >
+                      9:16
+                    </Button>
+                    <Button
+                      type={aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? 'primary' : 'default'}
+                      onClick={() => setAspectRatio(InvokeTextToVideoAspectRatioEnum._11)}
+                      className={styles.aspectButton}
+                    >
+                      1:1
+                    </Button>
                   </div>
                 </div>
-              ))}
+                <div className={styles.settingItem}>
+                  <span className={styles.settingLabel}>
+                    Prompt Optimization
+                    <Tooltip title="Enable prompt upsampler with LLM">
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </span>
+                  <Switch
+                    checked={!disablePromptUpsampler}
+                    onChange={(checked) => setDisablePromptUpsampler(!checked)}
+                  />
+                </div>
+              </div>
             </div>
-          ) : (
-            <PlaceholderContent />
-          )}
+
+            <div className={styles.negativePromptSection}>
+              <div className={styles.sectionTitle}>
+                <span className={styles.icon}>⛔</span>
+                <span>Negative Prompt (Optional)</span>
+              </div>
+              <div className={styles.inputWrapper}>
+                <TextArea
+                  value={negativePrompt}
+                  onChange={(e) => setNegativePrompt(e.target.value)}
+                  placeholder="Enter elements you don't want to see in the video"
+                  className={styles.input}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className={styles.buttonGroup}>
+              <Button
+                type="primary"
+                onClick={handleGenerate}
+                loading={loading}
+                disabled={isPromptEmpty || loading}
+                className={styles.generateButton}
+              >
+                Create
+              </Button>
+            </div>
+          </div>
+
+          <div className={styles.rightSection}>
+            {tasks.length > 0 ? (
+              <div className={styles.taskList}>
+                {tasks.map(task => (
+                  <div key={task.id} className={styles.taskItem}>
+                    <div 
+                      className={styles.taskContent}
+                      data-aspect-ratio={
+                        task.aspectRatio === InvokeTextToVideoAspectRatioEnum._11 ? "1:1" :
+                        task.aspectRatio === InvokeTextToVideoAspectRatioEnum._916 ? "9:16" :
+                        "16:9"
+                      }
+                    >
+                      {task.status === TaskStatus.Processing ? (
+                        <div className={styles.progressContainer}>
+                          <Progress 
+                            type="circle" 
+                            percent={taskStatusRef.current[task.id]?.progress || 0}
+                            format={(percent) => formatRemainingTime(percent)}
+                            strokeColor={{
+                              '0%': '#1668dc',
+                              '100%': '#1677ff',
+                            }}
+                          />
+                          <p className={styles.progressText}>Generating video...</p>
+                        </div>
+                      ) : task.status === TaskStatus.Completed && task.videoUrl ? (
+                        <video
+                          controls
+                          className={styles.video}
+                          src={task.videoUrl}
+                        >
+                          Your browser does not support video playback
+                        </video>
+                      ) : task.status === TaskStatus.Failed ? (
+                        <div className={styles.errorContainer}>
+                          <p className={styles.errorText}>{task.error || 'Failed to generate video'}</p>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className={styles.taskInfo}>
+                      <p className={styles.taskPrompt}>{task.prompt}</p>
+                      <p className={styles.taskTime}>
+                        {new Date(task.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <PlaceholderContent />
+            )}
+          </div>
         </div>
       </div>
     </div>
