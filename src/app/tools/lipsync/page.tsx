@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Progress, message, Upload, Typography, Radio, Select, Input } from 'antd';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
 import { TaskStatus } from '@/network/api';
@@ -288,6 +288,14 @@ export default function LipSyncPage() {
       });
   };
 
+   // Add this memoized handler near your other state declarations
+   const handlePromptChange = useCallback((e) => {
+    setPrompt(e.target.value);
+  }, []);
+
+  const videoPreviewUrl = useMemo(() => 
+    videoFile ? URL.createObjectURL(videoFile) : '', 
+  [videoFile]); 
 
   if (!isClient) return null;
 
@@ -312,8 +320,9 @@ export default function LipSyncPage() {
                 <div className={styles.videoPreviewContainer}>
                 <video 
                   className={styles.videoPreview}
-                  src={videoFile ? URL.createObjectURL(videoFile) : ''}
+                  src={videoPreviewUrl}
                   controls
+                  key="video-preview" // Add a stable key
                 />
                  <Button
                     icon={<DeleteOutlined />}
@@ -422,7 +431,7 @@ export default function LipSyncPage() {
                 <div className={styles.inputLabel}>Prompt</div>
                 <Input.TextArea
                   value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  onChange={handlePromptChange}
                   placeholder="Enter text for speech generation"
                   rows={4}
                   className={styles.textInput}

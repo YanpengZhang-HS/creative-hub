@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Input,  Progress, message, Upload, Typography } from 'antd';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
 import { TaskStatus } from '@/network/api';
@@ -241,6 +241,15 @@ export default function SoundEffectPage() {
       });
   };
 
+  // Add this memoized handler near your other state declarations
+  const handlePromptChange = useCallback((e) => {
+    setPrompt(e.target.value);
+  }, []);
+
+  const videoPreviewUrl = useMemo(() => 
+    videoFile ? URL.createObjectURL(videoFile) : '', 
+  [videoFile]);
+
   if (!isClient) return null;
 
   const isFilesEmpty = !videoFile;
@@ -264,8 +273,9 @@ export default function SoundEffectPage() {
                 <div className={styles.videoPreviewContainer}>
                   <video 
                     className={styles.videoPreview}
-                    src={videoFile ? URL.createObjectURL(videoFile) : ''}
+                    src={videoPreviewUrl}
                     controls
+                    key="video-preview" // Add a stable key
                   />
                    <Button
                       icon={<DeleteOutlined />}
@@ -332,7 +342,7 @@ export default function SoundEffectPage() {
           <div className={styles.inputWrapper}>
             <TextArea
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={handlePromptChange}
               placeholder="Enter text to describe what you want to generate. Check the tutorial for better results."
               className={styles.input}
               disabled={loading}

@@ -706,9 +706,9 @@
 .videoPreviewContainer {
   width: 100%;
   position: relative;
-  padding-top: 8px;
   height: 180px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .videoPreview {
@@ -717,6 +717,8 @@
   object-fit: contain;
   border-radius: 4px;
   background-color: #000;
+  /* Add this to prevent unnecessary repaints */
+  will-change: transform;
 }
 
 .uploadContainer {
