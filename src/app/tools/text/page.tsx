@@ -259,41 +259,39 @@ export default function TextToVideoPage() {
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          // Call backend API to delete the task
-          await backendApi.deleteTask(taskId);
-
-          // Remove from local state
-          setTasks(prevTasks => {
-            const newTasks = prevTasks.filter(task => task.id !== taskId);
-            
-            // Update localStorage
-            const existingTasksStr = localStorage.getItem('tasks');
-            if (existingTasksStr) {
-              try {
-                const existingTasks = JSON.parse(existingTasksStr);
-                const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
-                localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-              } catch (error) {
-                console.error('Failed to update tasks in localStorage:', error);
-              }
+      onOk: () => {
+        // Remove from local state immediately
+        setTasks(prevTasks => {
+          const newTasks = prevTasks.filter(task => task.id !== taskId);
+          
+          // Update localStorage
+          const existingTasksStr = localStorage.getItem('tasks');
+          if (existingTasksStr) {
+            try {
+              const existingTasks = JSON.parse(existingTasksStr);
+              const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
+              localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            } catch (error) {
+              console.error('Failed to update tasks in localStorage:', error);
             }
-            
-            return newTasks;
-          });
-
-          // Clear the timer if it exists
-          if (taskStatusRef.current[taskId]?.timer) {
-            clearInterval(taskStatusRef.current[taskId].timer);
-            delete taskStatusRef.current[taskId];
           }
+          
+          return newTasks;
+        });
 
-          message.success('Task deleted successfully');
-        } catch (error) {
-          message.error('Failed to delete task');
-          console.error('Error deleting task:', error);
+        // Clear the timer if it exists
+        if (taskStatusRef.current[taskId]?.timer) {
+          clearInterval(taskStatusRef.current[taskId].timer);
+          delete taskStatusRef.current[taskId];
         }
+
+        message.success('Task deleted successfully');
+
+        // Call backend API in the background
+        backendApi.deleteTask(taskId).catch(error => {
+          console.error('Error deleting task from backend:', error);
+          message.error('Failed to delete task from server');
+        });
       },
     });
   }, []);
