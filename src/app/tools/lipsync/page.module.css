@@ -769,3 +769,26 @@
   position: relative;
   margin-bottom: 20px;
 }
+
+.speakerSelectContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speakerSelectContainer .select {
+  flex: 1;
+}
+
+.playButton {
+  color: #1677ff;
+  font-size: 20px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playButton:hover {
+  color: #4096ff;
+}

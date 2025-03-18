@@ -8,7 +8,7 @@ import { TaskStatus } from '@/network/api';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { UploadOutlined, DeleteOutlined, PauseOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import type { RcFile } from 'antd/es/upload/interface';
 
 const { Title, Text } = Typography;
@@ -17,40 +17,9 @@ const { Option } = Select;
 const EMOTIONS = ["happy1", "happy2", "angry1", "angry2", "sad", "coquettish"];
 const LANGUAGES = ["English", "Korean", "Japanese", "Chinese"];
 const SPEEDS = ["slow1", "slow2", "fast1", "fast2"];
-const SPEAKERS = ["Indian_women_1", "Indian_women_2"];
+const SPEAKERS = ["Indian_man_3", "Indian_women_2"];
 
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
-
-interface TaskTimerStatus {
-  timer: NodeJS.Timeout;
-  startTime: number;
-  progress: number;
-}
-
-const formatRemainingTime = (progress: number | undefined) => {
-  if (progress === undefined || progress === 0) return '';
-  if (progress >= 99) return '< 1 min';
-  
-  const remainingSeconds = TOTAL_TIME * (1 - progress / 100);
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = Math.floor(remainingSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
-
-const PlaceholderContent = () => (
-  <div className={styles.taskList}>
-    <div className={styles.placeholder}>
-      <Image
-        src="/create_guide.svg"
-        alt="Start Creating"
-        width={240}
-        height={240}
-        priority
-      />
-      <p>Create your first lip sync video!</p>
-    </div>
-  </div>
-);
 
 export default function LipSyncPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -70,6 +39,78 @@ export default function LipSyncPage() {
   const [speed, setSpeed] = useState(SPEEDS[0]);
   const [speaker, setSpeaker] = useState(SPEAKERS[0]);
   const [cachedVideoTasks, setCachedVideoTasks] = useState<Task[]>([]);
+
+  // Add audio player state
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+  const [playingSpeaker, setPlayingSpeaker] = useState<string | null>(null);
+
+  const handlePlaySample = (speaker: string) => {
+    // If clicking the same speaker that's currently playing, pause it
+    if (playingSpeaker === speaker && currentAudio) {
+      currentAudio.pause();
+      setPlayingSpeaker(null);
+      setCurrentAudio(null);
+      return;
+    }
+
+    // Stop current audio if playing
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+
+    // Create new audio element
+    const audio = new Audio(`/sample/${speaker}.wav`);
+    audio.onended = () => {
+      setPlayingSpeaker(null);
+      setCurrentAudio(null);
+    };
+    
+    setCurrentAudio(audio);
+    setPlayingSpeaker(speaker);
+    audio.play();
+  };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+    };
+  }, [currentAudio]);
+
+  interface TaskTimerStatus {
+    timer: NodeJS.Timeout;
+    startTime: number;
+    progress: number;
+  }
+
+  const formatRemainingTime = (progress: number | undefined) => {
+    if (progress === undefined || progress === 0) return '';
+    if (progress >= 99) return '< 1 min';
+    
+    const remainingSeconds = TOTAL_TIME * (1 - progress / 100);
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = Math.floor(remainingSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const PlaceholderContent = () => (
+    <div className={styles.taskList}>
+      <div className={styles.placeholder}>
+        <Image
+          src="/create_guide.svg"
+          alt="Start Creating"
+          width={240}
+          height={240}
+          priority
+        />
+        <p>Create your first lip sync video!</p>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     setIsClient(true);
@@ -476,15 +517,26 @@ export default function LipSyncPage() {
                 </div>
                 <div className={styles.selectGroup}>
                   <div className={styles.inputLabel}>Speaker</div>
-                  <Select
-                    value={speaker}
-                    onChange={setSpeaker}
-                    className={styles.select}
-                  >
-                    {SPEAKERS.map(s => (
-                      <Option key={s} value={s}>{s}</Option>
-                    ))}
-                  </Select>
+                  <div className={styles.speakerSelectContainer}>
+                    <Select
+                      value={speaker}
+                      onChange={setSpeaker}
+                      className={styles.select}
+                    >
+                      {SPEAKERS.map(s => (
+                        <Option key={s} value={s}>{s}</Option>
+                      ))}
+                    </Select>
+                    <Button
+                      type="text"
+                      icon={playingSpeaker === speaker ? <PauseOutlined /> : <PlayCircleOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlaySample(speaker);
+                      }}
+                      className={styles.playButton}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
