@@ -792,3 +792,26 @@
 .playButton:hover {
   color: #4096ff;
 }
+
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 12px;
+}
+
+.taskHeader .taskPrompt {
+  flex: 1;
+  margin: 0;
+}
+
+.deleteButton {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.deleteButton:hover {
+  opacity: 1;
+}

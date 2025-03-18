@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input,  Progress, message, Upload, Typography } from 'antd';
+import { Button, Input,  Progress, message, Upload, Typography, Modal } from 'antd';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -250,6 +250,52 @@ export default function SoundEffectPage() {
     videoFile ? URL.createObjectURL(videoFile) : '', 
   [videoFile]);
 
+  const handleDeleteTask = useCallback((taskId: string) => {
+    Modal.confirm({
+      title: 'Delete Task',
+      content: 'Are you sure you want to delete this task? This action cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          // Call backend API to delete the task
+          await backendApi.deleteTask(taskId);
+
+          // Remove from local state
+          setTasks(prevTasks => {
+            const newTasks = prevTasks.filter(task => task.id !== taskId);
+            
+            // Update localStorage
+            const existingTasksStr = localStorage.getItem('tasks');
+            if (existingTasksStr) {
+              try {
+                const existingTasks = JSON.parse(existingTasksStr);
+                const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
+                localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+              } catch (error) {
+                console.error('Failed to update tasks in localStorage:', error);
+              }
+            }
+            
+            return newTasks;
+          });
+
+          // Clear the timer if it exists
+          if (taskStatusRef.current[taskId]?.timer) {
+            clearInterval(taskStatusRef.current[taskId].timer);
+            delete taskStatusRef.current[taskId];
+          }
+
+          message.success('Task deleted successfully');
+        } catch (error) {
+          message.error('Failed to delete task');
+          console.error('Error deleting task:', error);
+        }
+      },
+    });
+  }, []);
+
   if (!isClient) return null;
 
   const isFilesEmpty = !videoFile;
@@ -396,7 +442,16 @@ export default function SoundEffectPage() {
                     ) : null}
                   </div>
                   <div className={styles.taskInfo}>
-                    <p className={styles.taskPrompt}>{task.prompt}</p>
+                    <div className={styles.taskHeader}>
+                      <p className={styles.taskPrompt}>{task.prompt}</p>
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteTask(task.id)}
+                        className={styles.deleteButton}
+                        danger
+                      />
+                    </div>
                     <p className={styles.taskTime}>
                       {new Date(task.createdAt).toLocaleString()}
                     </p>
