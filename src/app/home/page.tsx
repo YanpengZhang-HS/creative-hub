@@ -38,6 +38,11 @@ export default function Home() {
       title: "Sound Effect",
       description: "Powered by JioHotstar AI",
       link: "/tools/soundeffect"
+    },
+    {
+      title: "Text To Music",
+      description: "Powered by JioHotstar AI",
+      link: "/tools/text2music"
     }
   ];
 

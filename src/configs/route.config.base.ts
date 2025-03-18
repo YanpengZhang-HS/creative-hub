@@ -10,6 +10,7 @@ export const pathToKeys: Record<string, string[]> = {
   '/tools/lipsync': ['/tools/lipsync', 'tools'],
   '/tools/soundeffect': ['/tools/soundeffect', 'tools'],
   '/creations': ['/creations'],
+  '/tools/text2music': ['/tools/text2music', 'tools']
 };
 
 // Helper type for type-safe path lookup

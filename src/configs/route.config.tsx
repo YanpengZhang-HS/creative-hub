@@ -45,6 +45,10 @@ export const menuItems: MenuItem[] = [
         key: '/tools/soundeffect',
         label: 'Sound Effect',
       },
+      {
+        key: '/tools/text2music',
+        label: 'Text to Music',
+      }
     ],
   },
   {
