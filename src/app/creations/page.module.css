@@ -1,29 +1,12 @@
 .hoverCard {
   background: #1f1f1f;
   border: none;
-  transition: all 0.3s ease;
   position: relative;
   z-index: 1;
   width: 100%;
   min-height: 200px;  /* Adjust this value based on your needs */
   display: flex;
   flex-direction: column;
-}
-
-.hoverCard:hover {
-  position: relative;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-  z-index: 2;
-  width: 100%;
-  min-height: 200px;
-  margin-bottom: -100px; /* Allow card to overlap next row */
-}
-
-.hoverCard:hover .collapsedPrompt {
-  -webkit-line-clamp: unset;
-   /* Expand prompt area */
-  margin-bottom: 100px;
-  transition: margin-bottom 0.3s ease;
 }
 
 .promptText {
@@ -54,11 +37,6 @@
   border-radius: 8px;
   overflow: hidden;
   background: #1a1a1a;
-  transition: transform 0.2s;
-}
-
-.videoCard:hover {
-  transform: translateY(-4px);
 }
 
 .videoWrapper {
@@ -92,11 +70,6 @@
   right: 12px;
   display: flex;
   gap: 8px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.videoCard:hover .actions {
   opacity: 1;
 }
 
@@ -106,12 +79,6 @@
   border-radius: 50%;
   cursor: pointer;
   color: white;
-  transition: all 0.2s;
-}
-
-.actions > span:hover {
-  background: rgba(0, 0, 0, 0.9);
-  color: var(--primary-color);
 }
 
 .favorited {
