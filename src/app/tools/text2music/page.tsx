@@ -80,20 +80,56 @@ export default function TextToMusicPage() {
     }
   }, []);
 
-  const saveTasks = useCallback((newTasks: Task[]) => {
-    localStorage.setItem('tasks', JSON.stringify(newTasks));
-    setTasks(newTasks);
-  }, []);
-
-  const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) => {
-    setTasks(prevTasks => {
-      const newTasks = prevTasks.map(task => 
-        task.id === taskId ? { ...task, ...updates } : task
+// 保存任务到 localStorage
+const saveTasks = useCallback((newTasks: Task[]) => {
+  const existingTasksStr = localStorage.getItem('tasks');
+  let allTasks: Task[] = [];
+  
+  if (existingTasksStr) {
+    try {
+      const existingTasks = JSON.parse(existingTasksStr);
+      // Filter out any tasks that would be duplicated by the new tasks
+      allTasks = existingTasks.filter((task: Task) => 
+        !newTasks.some(newTask => newTask.id === task.id)
       );
-      localStorage.setItem('tasks', JSON.stringify(newTasks));
-      return newTasks;
-    });
-  }, []);
+    } catch (error) {
+      console.error('Failed to parse existing tasks:', error);
+    }
+  }
+  
+  // Combine existing tasks with new tasks
+  const combinedTasks = [...newTasks, ...allTasks];
+  localStorage.setItem('tasks', JSON.stringify(combinedTasks));
+  setTasks(newTasks);
+}, []);
+
+// 更新任务状态
+const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) => {
+  setTasks(prevTasks => {
+    const newTasks = prevTasks.map(task => 
+      task.id === taskId ? { ...task, ...updates } : task
+    );
+    const existingTasksStr = localStorage.getItem('tasks');
+    let allTasks: Task[] = [];
+    
+    if (existingTasksStr) {
+      try {
+        const existingTasks = JSON.parse(existingTasksStr);
+        // Filter out any tasks that would be duplicated by the new tasks
+        allTasks = existingTasks.filter((task: Task) => 
+          !newTasks.some(newTask => newTask.id === task.id)
+        );
+      } catch (error) {
+        console.error('Failed to parse existing tasks:', error);
+      }
+    }
+    
+    // Combine existing tasks with new tasks
+    const combinedTasks = [...newTasks, ...allTasks];
+    localStorage.setItem('tasks', JSON.stringify(combinedTasks));
+    return newTasks;
+  });
+}, []);
 
   const checkTaskStatus = useCallback((task: Task) => {
     if (!task) return;
