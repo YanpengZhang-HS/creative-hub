@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Progress, message, Select, Space } from 'antd';
+import { Button, Input, Progress, message, Select, Space, Modal } from 'antd';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import { backendApi } from '@/network';
@@ -8,6 +8,7 @@ import { InvokeTextToMusicSecsEnum, TaskStatus } from '@/network/api';
 import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
+import { DeleteOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const TOTAL_TIME = 60; // 1 minutes in seconds
@@ -254,6 +255,50 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
 
   const isPromptEmpty = !prompt.trim();
 
+  const handleDeleteTask = useCallback((taskId: string) => {
+    Modal.confirm({
+      title: 'Delete Task',
+      content: 'Are you sure you want to delete this task? This action cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: () => {
+        // Remove from local state immediately
+        setTasks(prevTasks => {
+          const newTasks = prevTasks.filter(task => task.id !== taskId);
+          
+          // Update localStorage
+          const existingTasksStr = localStorage.getItem('tasks');
+          if (existingTasksStr) {
+            try {
+              const existingTasks = JSON.parse(existingTasksStr);
+              const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
+              localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            } catch (error) {
+              console.error('Failed to update tasks in localStorage:', error);
+            }
+          }
+          
+          return newTasks;
+        });
+
+        // Clear the timer if it exists
+        if (taskStatusRef.current[taskId]?.timer) {
+          clearInterval(taskStatusRef.current[taskId].timer);
+          delete taskStatusRef.current[taskId];
+        }
+
+        message.success('Task deleted successfully');
+
+        // Call backend API in the background
+        backendApi.deleteTask(taskId).catch(error => {
+          console.error('Error deleting task from backend:', error);
+          message.error('Failed to delete task from server');
+        });
+      },
+    });
+  }, []);
+
   if (!isClient) {
     return null;
   }
@@ -346,7 +391,16 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
                     ) : null}
                   </div>
                   <div className={styles.taskInfo}>
-                    <p className={styles.taskPrompt}>{task.prompt}</p>
+                    <div className={styles.taskHeader}>
+                      <p className={styles.taskPrompt}>{task.prompt}</p>
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteTask(task.id)}
+                        className={styles.deleteButton}
+                        danger
+                      />
+                    </div>
                     <p className={styles.taskTime}>
                       {new Date(task.createdAt).toLocaleString()}
                     </p>
