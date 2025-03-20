@@ -194,10 +194,11 @@ export default function LipSyncPage() {
   const checkTaskStatus = useCallback((task: Task) => {
     if (!task) return;
     const taskId = task.id;
+    
+    // Prevent multiple polling for the same task
     if (taskStatusRef.current[taskId]?.timer) {
-      clearInterval(taskStatusRef.current[taskId].timer);
+      return;
     }
-    // 找到对应任务的创建时间
 
     taskStatusRef.current[taskId] = {
       startTime: task.createdAt / 1000,
@@ -219,15 +220,19 @@ export default function LipSyncPage() {
                   status: TaskStatus.Completed,
                   videoUrl 
                 });
-                clearInterval(taskStatusRef.current[taskId].timer);
-                delete taskStatusRef.current[taskId];
+                if (taskStatusRef.current[taskId]?.timer) {
+                  clearInterval(taskStatusRef.current[taskId].timer);
+                  delete taskStatusRef.current[taskId];
+                }
               } else if (response.data.status === TaskStatus.Failed) {
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Failed,
                   error: response.data.error || 'Failed to generate video'
                 });
-                clearInterval(taskStatusRef.current[taskId].timer);
-                delete taskStatusRef.current[taskId];
+                if (taskStatusRef.current[taskId]?.timer) {
+                  clearInterval(taskStatusRef.current[taskId].timer);
+                  delete taskStatusRef.current[taskId];
+                }
                 message.error({
                   content: response.data.error || 'Failed to generate video',
                   duration: 5,
@@ -239,7 +244,31 @@ export default function LipSyncPage() {
         }
       }, 1000)
     };
-  }, [tasks, updateTaskStatus]);
+  }, [updateTaskStatus]);
+
+  // Add cleanup effect for timers
+  useEffect(() => {
+    return () => {
+      // Cleanup all timers on unmount
+      Object.values(taskStatusRef.current).forEach(status => {
+        if (status.timer) {
+          clearInterval(status.timer);
+        }
+      });
+      taskStatusRef.current = {};
+    };
+  }, []);
+
+  // Add effect to cleanup timers for completed or failed tasks
+  useEffect(() => {
+    tasks.forEach(task => {
+      if ((task.status === TaskStatus.Completed || task.status === TaskStatus.Failed) && 
+          taskStatusRef.current[task.id]?.timer) {
+        clearInterval(taskStatusRef.current[task.id].timer);
+        delete taskStatusRef.current[task.id];
+      }
+    });
+  }, [tasks]);
 
   const handleGenerate = async () => {
     if (!videoFile) {

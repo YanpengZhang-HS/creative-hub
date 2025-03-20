@@ -134,8 +134,10 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
   const checkTaskStatus = useCallback((task: Task) => {
     if (!task) return;
     const taskId = task.id;
+    
+    // Prevent multiple polling for the same task
     if (taskStatusRef.current[taskId]?.timer) {
-      clearInterval(taskStatusRef.current[taskId].timer);
+      return;
     }
 
     taskStatusRef.current[taskId] = {
@@ -158,15 +160,19 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
                   status: TaskStatus.Completed,
                   audioUrl 
                 });
-                clearInterval(taskStatusRef.current[taskId].timer);
-                delete taskStatusRef.current[taskId];
+                if (taskStatusRef.current[taskId]?.timer) {
+                  clearInterval(taskStatusRef.current[taskId].timer);
+                  delete taskStatusRef.current[taskId];
+                }
               } else if (response.data.status === TaskStatus.Failed) {
                 updateTaskStatus(taskId, { 
                   status: TaskStatus.Failed,
                   error: response.data.error || 'Failed to generate audio'
                 });
-                clearInterval(taskStatusRef.current[taskId].timer);
-                delete taskStatusRef.current[taskId];
+                if (taskStatusRef.current[taskId]?.timer) {
+                  clearInterval(taskStatusRef.current[taskId].timer);
+                  delete taskStatusRef.current[taskId];
+                }
                 message.error({
                   content: response.data.error || 'Failed to generate audio',
                   duration: 5,
@@ -225,12 +231,26 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
 
   useEffect(() => {
     return () => {
+      // Cleanup all timers on unmount
       Object.values(taskStatusRef.current).forEach(status => {
-        clearInterval(status.timer);
+        if (status.timer) {
+          clearInterval(status.timer);
+        }
       });
       taskStatusRef.current = {};
     };
   }, []);
+
+  // Add effect to cleanup timers for completed or failed tasks
+  useEffect(() => {
+    tasks.forEach(task => {
+      if ((task.status === TaskStatus.Completed || task.status === TaskStatus.Failed) && 
+          taskStatusRef.current[task.id]?.timer) {
+        clearInterval(taskStatusRef.current[task.id].timer);
+        delete taskStatusRef.current[task.id];
+      }
+    });
+  }, [tasks]);
 
   const isPromptEmpty = !prompt.trim();
 
