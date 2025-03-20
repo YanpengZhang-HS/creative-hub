@@ -48,6 +48,7 @@ export default function CreationsPage() {
 
   useEffect(() => {
     setIsClient(true);
+    // 加载任务数据
     const savedTasks = localStorage.getItem('tasks');
     if (savedTasks) {
       try {
@@ -57,7 +58,25 @@ export default function CreationsPage() {
         console.error('Failed to parse tasks:', error);
       }
     }
+    
+    // 加载过滤器状态 - 使用 sessionStorage 而不是 localStorage
+    const savedMediaTypes = sessionStorage.getItem('selectedMediaTypes');
+    if (savedMediaTypes) {
+      try {
+        const parsedMediaTypes = JSON.parse(savedMediaTypes);
+        setSelectedMediaTypes(parsedMediaTypes);
+      } catch (error) {
+        console.error('Failed to parse media types:', error);
+      }
+    }
   }, []);
+
+  // 当选中的媒体类型变化时，保存到 sessionStorage
+  useEffect(() => {
+    if (isClient) {
+      sessionStorage.setItem('selectedMediaTypes', JSON.stringify(selectedMediaTypes));
+    }
+  }, [selectedMediaTypes, isClient]);
 
   if (!isClient) return null;
 
