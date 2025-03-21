@@ -75,6 +75,40 @@ export default function ImageToVideoPage() {
   const [textToImageTasks, setTextToImageTasks] = useState<Task[]>([]);
   const [imageLoading, setImageLoading] = useState(false);
   const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosImageToVideoV1);
+  const leftSectionRef = useRef<HTMLDivElement>(null);
+
+  // 处理嵌套滚动效果
+  useEffect(() => {
+    const leftSection = leftSectionRef.current;
+    if (!leftSection) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const { deltaY } = e;
+      const { scrollTop, scrollHeight, clientHeight } = leftSection;
+      
+      // 判断是否已经滚动到顶部或底部
+      const isAtTop = scrollTop <= 0;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight <= 1;
+      
+      // 如果在顶部并且继续向上滚动，或者在底部并且继续向下滚动，则让页面滚动
+      if ((isAtTop && deltaY < 0) || (isAtBottom && deltaY > 0)) {
+        // 不阻止默认行为，允许页面滚动
+        return;
+      }
+      
+      // 如果左侧区域还可以滚动，则阻止页面滚动，只让左侧区域滚动
+      if (scrollHeight > clientHeight) {
+        e.preventDefault();
+        leftSection.scrollTop += deltaY;
+      }
+    };
+
+    leftSection.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      leftSection.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // 处理客户端初始化
   useEffect(() => {
@@ -513,7 +547,7 @@ export default function ImageToVideoPage() {
     return (
       <div className={styles.pageContainer}>
         <div className={styles.mainContent}>
-          <div className={styles.leftSection}>
+          <div className={styles.leftSection} ref={leftSectionRef}>
             <div className={styles.settingItem}>
               <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
                 <span className={styles.icon}>🤖</span>
@@ -639,7 +673,7 @@ export default function ImageToVideoPage() {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainContent}>
-        <div className={styles.leftSection}>
+        <div className={styles.leftSection} ref={leftSectionRef}>
           <div className={styles.settingItem}>
             <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
               <span className={styles.icon}>🤖</span>
