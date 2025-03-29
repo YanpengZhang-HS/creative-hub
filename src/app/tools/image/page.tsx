@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
 import { InvokeImageToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
@@ -76,6 +76,9 @@ export default function ImageToVideoPage() {
   const [imageLoading, setImageLoading] = useState(false);
   const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosImageToVideoV1);
   const leftSectionRef = useRef<HTMLDivElement>(null);
+  const createdImagesListRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   // 处理嵌套滚动效果
   useEffect(() => {
@@ -495,6 +498,98 @@ export default function ImageToVideoPage() {
     img.src = imageUrl;
   };
 
+  // 处理图片列表的滚动状态检查
+  const checkScrollState = useCallback(() => {
+    if (createdImagesListRef.current) {
+      const container = createdImagesListRef.current;
+      // 是否可以向左滚动（当前滚动位置是否大于0）
+      setCanScrollLeft(container.scrollLeft > 0);
+      // 是否可以向右滚动（总宽度减去当前滚动位置和容器宽度是否大于1像素）
+      setCanScrollRight(
+        container.scrollWidth - container.scrollLeft - container.clientWidth > 1
+      );
+    }
+  }, []);
+
+  // 监听列表的滚动事件
+  useEffect(() => {
+    const container = createdImagesListRef.current;
+    if (container) {
+      // 初始检查滚动状态
+      checkScrollState();
+      // 监听滚动事件
+      container.addEventListener('scroll', checkScrollState);
+      // 添加窗口大小改变事件监听，因为它可能影响容器大小
+      window.addEventListener('resize', checkScrollState);
+      
+      return () => {
+        container.removeEventListener('scroll', checkScrollState);
+        window.removeEventListener('resize', checkScrollState);
+      };
+    }
+  }, [checkScrollState, textToImageTasks]);
+
+  // 处理图片列表的左滑动
+  const handleScrollLeft = () => {
+    if (createdImagesListRef.current && canScrollLeft) {
+      createdImagesListRef.current.scrollBy({
+        left: -200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // 处理图片列表的右滑动
+  const handleScrollRight = () => {
+    if (createdImagesListRef.current && canScrollRight) {
+      createdImagesListRef.current.scrollBy({
+        left: 200,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  // 替换 createdImagesList 的实现，在左右两侧添加箭头
+  const renderCreatedImagesList = () => {
+    if (textToImageTasks.length === 0) return null;
+    
+    return (
+      <div className={styles.createdImagesSection}>
+        <div className={styles.createdImagesTitle}>From Creations</div>
+        <div className={styles.createdImagesListContainer}>
+          <Button 
+            type="text" 
+            icon={<LeftOutlined />} 
+            className={styles.scrollArrow + ' ' + styles.leftArrow}
+            onClick={handleScrollLeft}
+            disabled={!canScrollLeft}
+          />
+          <div 
+            className={styles.createdImagesList} 
+            ref={createdImagesListRef}
+          >
+            {textToImageTasks.map(task => (
+              <div 
+                key={task.id} 
+                className={styles.createdImageItem}
+                onClick={() => handleSelectTextToImageTask(task.imageUrl!)}
+              >
+                <img src={task.imageUrl!} alt={task.prompt} />
+              </div>
+            ))}
+          </div>
+          <Button 
+            type="text" 
+            icon={<RightOutlined />} 
+            className={styles.scrollArrow + ' ' + styles.rightArrow}
+            onClick={handleScrollRight}
+            disabled={!canScrollRight}
+          />
+        </div>
+      </div>
+    );
+  };
+
   const isPromptEmpty = !prompt.trim();
   const isImageEmpty = !imageFile && !imagePreview;
 
@@ -698,7 +793,10 @@ export default function ImageToVideoPage() {
             <span>Image</span>
           </div>
           <div className={styles.imageUploadSection}>
-            <div className={styles.uploadContainer} onClick={imageLoading ? undefined : triggerImageUpload}>
+            <div
+              className={styles.uploadContainer}
+              onClick={!imageLoading ? triggerImageUpload : undefined}
+            >
               <input
                 type="file"
                 ref={fileInputRef}
@@ -710,51 +808,36 @@ export default function ImageToVideoPage() {
               {imagePreview ? (
                 <>
                   <img src={imagePreview} alt="Uploaded" className={styles.uploadedImage} />
-                  {imageLoading && (
-                    <div className={styles.uploadLoading}>
-                      <div>
-                        <Spin size="small" />
-                        <div className={styles.uploadLoadingText}>Loading image...</div>
-                      </div>
-                    </div>
-                  )}
                   <div className={styles.uploadOverlay}>
-                    <div className={styles.replaceButton}>{imageLoading ? "Loading..." : "Replace Image"}</div>
+                    <p className={styles.replaceButton}>
+                      Replace
+                      <UploadOutlined style={{ marginLeft: '8px' }} />
+                    </p>
                   </div>
                   <Button
                     icon={<DeleteOutlined />}
                     className={styles.deleteImageButton}
                     onClick={handleDeleteImage}
-                    type="primary"
-                    danger
                   />
                 </>
+              ) : imageLoading ? (
+                <div className={styles.uploadLoading}>
+                  <Spin size="large" />
+                  <div className={styles.uploadLoadingText}>Uploading...</div>
+                </div>
               ) : (
                 <>
-                  <UploadOutlined className={styles.uploadIcon} />
+                  <div className={styles.uploadIcon}>
+                    <PlusOutlined style={{ fontSize: '20px' }} />
+                  </div>
                   <div className={styles.uploadText}>Click to upload an image</div>
                 </>
               )}
             </div>
           </div>
           
-          {/* 添加Text to Image图片列表 */}
-          {textToImageTasks.length > 0 && (
-            <div className={styles.createdImagesSection}>
-              <div className={styles.createdImagesTitle}>From Creations</div>
-              <div className={styles.createdImagesList}>
-                {textToImageTasks.map(task => (
-                  <div 
-                    key={task.id} 
-                    className={styles.createdImageItem}
-                    onClick={() => handleSelectTextToImageTask(task.imageUrl!)}
-                  >
-                    <img src={task.imageUrl!} alt={task.prompt} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* 替换原来的图片列表部分为新的带箭头的列表 */}
+          {renderCreatedImagesList()}
           
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>✨</span>
