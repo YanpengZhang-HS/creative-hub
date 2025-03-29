@@ -465,7 +465,7 @@
 .imageUploadSection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .uploadContainer {
@@ -577,7 +577,7 @@
 }
 
 .createdImagesSection {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .createdImagesTitle {
@@ -717,41 +717,44 @@
 .modelSelect {
   margin-bottom: 0;
   text-align: left;
+  display: flex;
+  align-items: center;
 }
 
 .modelSelect :global(.ant-select-selector) {
-  background: #1a1b1e !important;
+  background: rgba(0, 0, 0, 0.2) !important;
   border: 1px solid #2a2b2e !important;
-  color: #fff !important;
   height: 40px !important;
   border-radius: 8px !important;
-  font-family: 'JetBrains Mono', monospace !important;
 }
 
 .modelSelect :global(.ant-select-selection-item) {
   color: #fff !important;
   line-height: 38px !important;
-  padding-left: 6px;
+}
+
+.modelSelect :global(.ant-select-arrow) {
+  color: #666 !important;
 }
 
 .modelSelect :global(.ant-select-dropdown) {
-  background-color: #2a2b2e !important;
-  border: 1px solid #3a3b3e !important;
+  background: #1f1f1f !important;
+  border: 1px solid #2a2b2e !important;
 }
 
 .modelSelect :global(.ant-select-item) {
   color: #ccc !important;
-  padding: 10px 12px !important;
-  font-family: 'JetBrains Mono', monospace !important;
+  padding: 8px 12px !important;
+  font-family: monospace !important;
 }
 
 .modelSelect :global(.ant-select-item-option-selected) {
-  background-color: #1668dc !important;
-  color: white !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: #fff !important;
 }
 
 .modelSelect :global(.ant-select-item-option-active:not(.ant-select-item-option-selected)) {
-  background-color: #444 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .taskHeader {
