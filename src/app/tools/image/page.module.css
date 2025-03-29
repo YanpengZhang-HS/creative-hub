@@ -666,11 +666,12 @@
   border: 2px solid transparent;
   transition: all 0.2s ease;
   position: relative;
+  margin: 2px;
 }
 
 .createdImageItem:hover {
   border-color: var(--primary-color);
-  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .createdImageItem:hover::after {
