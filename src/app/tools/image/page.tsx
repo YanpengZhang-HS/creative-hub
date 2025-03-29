@@ -10,10 +10,14 @@ import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
 import { InvokeImageToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { 
+  ReloadOutlined, UploadOutlined, PlusOutlined, DeleteOutlined, 
+  LeftOutlined, RightOutlined, InfoCircleOutlined 
+} from '@ant-design/icons';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
+const { Option } = Select;
 const TOTAL_TIME = 20 * 60; // 20 minutes in seconds
 
 interface TaskTimerStatus {
@@ -644,7 +648,7 @@ export default function ImageToVideoPage() {
         <div className={styles.mainContent}>
           <div className={styles.leftSection} ref={leftSectionRef}>
             <div className={styles.settingItem}>
-              <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+              <div className={styles.sectionTitle} style={{ marginBottom: 0, display: 'flex', alignItems: 'center' }}>
                 <span className={styles.icon}>🤖</span>
                 <span>Model</span>
               </div>
@@ -652,15 +656,15 @@ export default function ImageToVideoPage() {
                 className={styles.modelSelect}
                 value={modelPipeline}
                 onChange={(value) => setModelPipeline(value)}
-                options={[
-                  { value: MLPipelineEnum.CosmosImageToVideoV1, label: MLPipelineEnum.CosmosImageToVideoV1 },
-                  { value: MLPipelineEnum.SkyreelsImageToVideoV1, label: MLPipelineEnum.SkyreelsImageToVideoV1 },
-                ]}
+                disabled={loading}
                 style={{ width: '70%' }}
-              />
+              >
+                <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
+                <Option value={MLPipelineEnum.SkyreelsImageToVideoV1}>{MLPipelineEnum.SkyreelsImageToVideoV1}</Option>
+              </Select>
             </div>
 
-            <div style={{ marginBottom: '16px' }}></div>
+            <div style={{ marginBottom: '8px' }}></div>
 
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>🖼️</span>
@@ -770,7 +774,7 @@ export default function ImageToVideoPage() {
       <div className={styles.mainContent}>
         <div className={styles.leftSection} ref={leftSectionRef}>
           <div className={styles.settingItem}>
-            <div className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+            <div className={styles.sectionTitle} style={{ marginBottom: 0, display: 'flex', alignItems: 'center' }}>
               <span className={styles.icon}>🤖</span>
               <span>Model</span>
             </div>
@@ -778,15 +782,15 @@ export default function ImageToVideoPage() {
               className={styles.modelSelect}
               value={modelPipeline}
               onChange={(value) => setModelPipeline(value)}
-              options={[
-                { value: MLPipelineEnum.CosmosImageToVideoV1, label: MLPipelineEnum.CosmosImageToVideoV1 },
-                { value: MLPipelineEnum.SkyreelsImageToVideoV1, label: MLPipelineEnum.SkyreelsImageToVideoV1 },
-              ]}
+              disabled={loading}
               style={{ width: '70%' }}
-            />
+            >
+              <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
+              <Option value={MLPipelineEnum.SkyreelsImageToVideoV1}>{MLPipelineEnum.SkyreelsImageToVideoV1}</Option>
+            </Select>
           </div>
 
-          <div style={{ marginBottom: '16px' }}></div>
+          <div style={{ marginBottom: '8px' }}></div>
 
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>🖼️</span>
