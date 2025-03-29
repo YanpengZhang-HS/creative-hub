@@ -78,7 +78,7 @@ export default function ImageToVideoPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [textToImageTasks, setTextToImageTasks] = useState<Task[]>([]);
   const [imageLoading, setImageLoading] = useState(false);
-  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosImageToVideoV1);
+  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.SkyreelsImageToVideoV1);
   const leftSectionRef = useRef<HTMLDivElement>(null);
   const createdImagesListRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -659,8 +659,8 @@ export default function ImageToVideoPage() {
                 disabled={loading}
                 style={{ width: '70%' }}
               >
-                <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
                 <Option value={MLPipelineEnum.SkyreelsImageToVideoV1}>{MLPipelineEnum.SkyreelsImageToVideoV1}</Option>
+                <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
               </Select>
             </div>
 
@@ -785,8 +785,8 @@ export default function ImageToVideoPage() {
               disabled={loading}
               style={{ width: '70%' }}
             >
-              <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
               <Option value={MLPipelineEnum.SkyreelsImageToVideoV1}>{MLPipelineEnum.SkyreelsImageToVideoV1}</Option>
+              <Option value={MLPipelineEnum.CosmosImageToVideoV1}>{MLPipelineEnum.CosmosImageToVideoV1}</Option>
             </Select>
           </div>
 

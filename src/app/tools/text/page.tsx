@@ -58,7 +58,7 @@ export default function TextToVideoPage() {
   const [aspectRatio, setAspectRatio] = useState<InvokeTextToVideoAspectRatioEnum>(InvokeTextToVideoAspectRatioEnum._169);
   const [disablePromptUpsampler, setDisablePromptUpsampler] = useState(false);
   const [negativePrompt, setNegativePrompt] = useState('');
-  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.CosmosTextToVideoV1);
+  const [modelPipeline, setModelPipeline] = useState<MLPipelineEnum>(MLPipelineEnum.SkyreelsTextToVideoV1);
 
   // 处理客户端初始化
   useEffect(() => {
@@ -333,8 +333,8 @@ export default function TextToVideoPage() {
                 disabled={loading}
                 style={{ width: '70%' }}
               >
-                <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
                 <Option value={MLPipelineEnum.SkyreelsTextToVideoV1}>{MLPipelineEnum.SkyreelsTextToVideoV1}</Option>
+                <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
               </Select>
             </div>
 
@@ -470,8 +470,8 @@ export default function TextToVideoPage() {
               disabled={loading}
               style={{ width: '70%' }}
             >
-              <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
               <Option value={MLPipelineEnum.SkyreelsTextToVideoV1}>{MLPipelineEnum.SkyreelsTextToVideoV1}</Option>
+              <Option value={MLPipelineEnum.CosmosTextToVideoV1}>{MLPipelineEnum.CosmosTextToVideoV1}</Option>
             </Select>
           </div>
 
