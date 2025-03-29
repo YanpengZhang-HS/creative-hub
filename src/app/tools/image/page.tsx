@@ -664,7 +664,7 @@ export default function ImageToVideoPage() {
               </Select>
             </div>
 
-            <div style={{ marginBottom: '8px' }}></div>
+            <div style={{ marginBottom: '16px' }}></div>
 
             <div className={styles.sectionTitle}>
               <span className={styles.icon}>🖼️</span>
@@ -790,7 +790,7 @@ export default function ImageToVideoPage() {
             </Select>
           </div>
 
-          <div style={{ marginBottom: '8px' }}></div>
+          <div style={{ marginBottom: '16px' }}></div>
 
           <div className={styles.sectionTitle}>
             <span className={styles.icon}>🖼️</span>
