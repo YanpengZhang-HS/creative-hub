@@ -465,7 +465,7 @@
 .imageUploadSection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .uploadContainer {
@@ -577,7 +577,7 @@
 }
 
 .createdImagesSection {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .createdImagesTitle {
