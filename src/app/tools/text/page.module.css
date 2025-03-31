@@ -116,6 +116,8 @@
   border: 1px solid #2a2b2e;
   border-radius: 8px;
   padding: 24px;
+  overflow-y: auto;
+  max-height: calc(100vh - 48px);
 }
 
 .rightSection {
@@ -326,6 +328,23 @@
 .errorText {
   color: #ff4d4f;
   margin: 0;
+}
+
+.leftSection::-webkit-scrollbar {
+  width: 6px;
+}
+
+.leftSection::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.leftSection::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+.leftSection::-webkit-scrollbar-thumb:hover {
+  background: #444;
 }
 
 .taskList::-webkit-scrollbar {
