@@ -508,3 +508,36 @@
 .deleteButton:hover {
   opacity: 1;
 }
+
+/* Add these styles for the image container and download button */
+.imageContainer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.downloadButton {
+  position: absolute !important;
+  top: 10px;
+  right: 10px;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  z-index: 10;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border: none !important;
+}
+
+.downloadButton:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}

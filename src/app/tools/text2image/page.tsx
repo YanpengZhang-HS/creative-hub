@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
 import { InvokeTextToVideoAspectRatioEnum } from '@/network/api';
-import { ReloadOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ReloadOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const TOTAL_TIME = 20 ; // 20 minutes in seconds
@@ -286,6 +286,18 @@ export default function TextToImagePage() {
   };
 
   const isPromptEmpty = !prompt.trim();
+
+  const handleDownloadImage = useCallback((imageUrl: string, prompt: string) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    // Create a filename based on the prompt (limited to 30 chars) and add timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const sanitizedPrompt = prompt.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '_');
+    link.download = `${sanitizedPrompt}_${timestamp}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, []);
 
   const handleDeleteTask = useCallback((taskId: string) => {
     Modal.confirm({
@@ -570,6 +582,7 @@ export default function TextToImagePage() {
                         <p className={styles.progressText}>Generating image...</p>
                       </div>
                     ) : task.status === TaskStatus.Completed && task.imageUrl ? (
+                    <div className={styles.imageContainer}>
                       <img
                         src={task.imageUrl}
                         alt="Start Creating"
@@ -579,6 +592,16 @@ export default function TextToImagePage() {
                           borderRadius: '8px'
                         }}
                         />
+                        <Button
+                          type="primary"
+                          icon={<DownloadOutlined />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadImage(task.imageUrl || '', task.prompt);
+                          }}
+                          className={styles.downloadButton}
+                        />
+                    </div>
                     ) : task.status === TaskStatus.Failed ? (
                       <div className={styles.errorContainer}>
                         <p className={styles.errorText}>{task.error || 'Failed to generate image'}</p>
