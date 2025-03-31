@@ -126,10 +126,8 @@ export default function CreationsPage() {
       return;
     }
 
-    try {
-      // Ensure the URL is absolute
-      const absoluteUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url}`;
-      await navigator.clipboard.writeText(absoluteUrl);
+  try {
+      await navigator.clipboard.writeText(url);
       message.success('URL copied to clipboard');
     } catch (error) {
       console.error('Failed to copy URL to clipboard:', error);
