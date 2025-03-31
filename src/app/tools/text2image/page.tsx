@@ -156,7 +156,6 @@ export default function TextToImagePage() {
     if (!task) return;
     const taskId = task.id;
     
-    // Prevent multiple polling for the same task
     if (taskStatusRef.current[taskId]?.timer) {
       return;
     }
@@ -165,44 +164,37 @@ export default function TextToImagePage() {
       startTime: task.createdAt / 1000,
       progress: 0,
       timer: setInterval(() => {
-        const now = Date.now() / 1000;
-        const elapsed = Math.floor(now - taskStatusRef.current[taskId].startTime);
-        const percentage = Math.min((elapsed / TOTAL_TIME) * 100, 99);
-        
-        taskStatusRef.current[taskId].progress = percentage;
-        updateTaskStatus(taskId, { status: TaskStatus.Processing });
-
-        if (elapsed % 5 === 0) {
-          backendApi.getTaskStatus(taskId).then((response) => {
-            if (response.status === 200) {
-              if (response.data.status === TaskStatus.Completed) {
-                const imageUrl = API_CONFIG.getImageUrl(taskId);
-                updateTaskStatus(taskId, { 
-                  status: TaskStatus.Completed,
-                  imageUrl 
-                });
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-              } else if (response.data.status === TaskStatus.Failed) {
-                updateTaskStatus(taskId, { 
-                  status: TaskStatus.Failed,
-                  error: response.data.error || 'Failed to generate image'
-                });
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-                message.error({
-                  content: response.data.error || 'Failed to generate image',
-                  duration: 5,
-                  style: { marginTop: '20vh' }
-                });
-              }
+        backendApi.getTaskStatus(taskId).then((response) => {
+          if (response.status === 200) {
+            if (response.data.status === TaskStatus.Completed) {
+              const imageUrl = API_CONFIG.getImageUrl(taskId);
+              updateTaskStatus(taskId, { 
+                status: TaskStatus.Completed,
+                imageUrl 
+              });
+              clearInterval(taskStatusRef.current[taskId].timer);
+              delete taskStatusRef.current[taskId];
+            } else if (response.data.status === TaskStatus.Failed) {
+              updateTaskStatus(taskId, { 
+                status: TaskStatus.Failed,
+                error: response.data.error || 'Failed to generate image'
+              });
+              clearInterval(taskStatusRef.current[taskId].timer);
+              delete taskStatusRef.current[taskId];
+              message.error({
+                content: response.data.error || 'Failed to generate image',
+                duration: 5,
+                style: { marginTop: '20vh' }
+              });
+            } else if (response.data.progress !== undefined && response.data.progress !== null) {
+              const progress = response.data.progress;
+              taskStatusRef.current[taskId].progress = progress;
+              updateTaskStatus(taskId, { 
+                status: TaskStatus.Processing 
+              });
             }
-          });
-        }
+          }
+        });
       }, 1000)
     };
   }, [updateTaskStatus]);
@@ -567,18 +559,37 @@ export default function TextToImagePage() {
               {tasks.map(task => (
                 <div key={task.id} className={styles.taskItem}>
                   <div className={styles.taskContent}>
-                    {task.status === TaskStatus.Processing ? (
+                    {task.status === TaskStatus.Pending ? (
                       <div className={styles.progressContainer}>
                         <Progress 
                           type="circle" 
-                          percent={taskStatusRef.current[task.id]?.progress || 0}
-                          format={(percent) => formatRemainingTime(percent)}
+                          percent={0}
+                          format={() => (
+                            <span className={styles.progressText}>
+                              Queuing...
+                            </span>
+                          )}
                           strokeColor={{
                             '0%': '#1668dc',
                             '100%': '#1677ff',
                           }}
                         />
-                        <p className={styles.progressText}>Generating image...</p>
+                      </div>
+                    ) : task.status === TaskStatus.Processing ? (
+                      <div className={styles.progressContainer}>
+                        <Progress 
+                          type="circle" 
+                          percent={taskStatusRef.current[task.id]?.progress || 0}
+                          format={(percent) => (
+                            <span className={styles.progressText}>
+                              Generating... {percent ? `${Math.floor(percent)}%` : '0%'}
+                            </span>
+                          )}
+                          strokeColor={{
+                            '0%': '#1668dc',
+                            '100%': '#1677ff',
+                          }}
+                        />
                       </div>
                     ) : task.status === TaskStatus.Completed && task.imageUrl ? (
                     <div className={styles.imageContainer}>

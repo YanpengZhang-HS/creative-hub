@@ -113,6 +113,18 @@ export interface TaskInfo {
      * @memberof TaskInfo
      */
     'error_detail'?: object | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof TaskInfo
+     */
+    'progress'?: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof TaskInfo
+     */
+    'progress_message'?: string | null;
 }
 
 
