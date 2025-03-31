@@ -126,8 +126,23 @@ export default function CreationsPage() {
       return;
     }
 
-  try {
-      await navigator.clipboard.writeText(url);
+    try {
+      // Try using the Clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback to the old method
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
       message.success('URL copied to clipboard');
     } catch (error) {
       console.error('Failed to copy URL to clipboard:', error);
