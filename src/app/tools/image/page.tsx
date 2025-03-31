@@ -637,7 +637,6 @@ export default function ImageToVideoPage() {
         // Call backend API in the background
         backendApi.deleteTask(taskId).catch(error => {
           console.error('Error deleting task from backend:', error);
-          message.error('Failed to delete task from server');
         });
       },
     });

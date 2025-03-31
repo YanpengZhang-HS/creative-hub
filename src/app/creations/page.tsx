@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Row, Col, Checkbox, Divider } from 'antd';
+import { Card, Typography, Row, Col, Checkbox, Divider, Button, message, Space, Modal } from 'antd';
 import styles from './page.module.css';
 import type { Task, TaskType } from '@/types/task';
 import { TaskStatus } from '@/network/api';
 import { getTaskTypeDisplayValue } from '@/types/task';
+import { backendApi } from '@/network';
+import Image from 'next/image';
+import { API_CONFIG } from '@/configs/api.config';
+import { DeleteOutlined, ShareAltOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -96,6 +100,80 @@ export default function CreationsPage() {
   const videoFilteredTasks = filteredTasks.filter(task => taskTypeToMediaType[task.taskType] === MediaType.Video);
   const audioFilteredTasks = filteredTasks.filter(task => taskTypeToMediaType[task.taskType] === MediaType.Audio);
 
+  const handleShare = async (task: Task) => {
+    let url = '';
+    switch (task.taskType) {
+      case 'text_to_image':
+        url = task.imageUrl || '';
+        break;
+      case 'text_to_video':
+      case 'image_to_video':
+      case 'video_to_video':
+      case 'lip_sync':
+      case 'sound_effect':
+        url = task.videoUrl || '';
+        break;
+      case 'text_to_music':
+        url = task.audioUrl || '';
+        break;
+      default:
+        message.error('Unsupported task type for sharing');
+        return;
+    }
+
+    if (!url) {
+      message.error('No media URL available to share');
+      return;
+    }
+
+    try {
+      // Ensure the URL is absolute
+      const absoluteUrl = url.startsWith('http') ? url : `${API_CONFIG.BASE_URL}${url}`;
+      await navigator.clipboard.writeText(absoluteUrl);
+      message.success('URL copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy URL to clipboard:', error);
+      message.error('Failed to copy URL to clipboard');
+    }
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    Modal.confirm({
+      title: 'Delete Task',
+      content: 'Are you sure you want to delete this task? This action cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: () => {
+        // Remove from local state immediately
+        setTasks(prevTasks => {
+          const newTasks = prevTasks.filter(task => task.id !== taskId);
+          
+          // Update localStorage
+          const existingTasksStr = localStorage.getItem('tasks');
+          if (existingTasksStr) {
+            try {
+              const existingTasks = JSON.parse(existingTasksStr);
+              const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
+              localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            } catch (error) {
+              console.error('Failed to update tasks in localStorage:', error);
+            }
+          }
+          
+          return newTasks;
+        });
+
+        message.success('Task deleted successfully');
+
+        // Call backend API in the background
+        backendApi.deleteTask(taskId).catch(error => {
+          console.error('Error deleting task from backend:', error);
+        });
+      },
+    });
+  };
+
   // 渲染任务卡片
   const renderTask = (task: Task) => (
     <Col xs={24} sm={12} md={8} key={task.id}>
@@ -176,21 +254,25 @@ export default function CreationsPage() {
               </div>
             )}
           </div>
-          <div>
-            <Text
-              style={{
-                color: '#888',
-                fontSize: '14px',
-                height: '40px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical'
-              }}
-            >
-              {task.prompt}
-            </Text>
+          <div className={styles.cardContent}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>{task.prompt}</h3>
+              <Space>
+                <Button
+                  type="text"
+                  icon={<ShareAltOutlined />}
+                  onClick={() => handleShare(task)}
+                  className={styles.actionButton}
+                />
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDeleteTask(task.id)}
+                  className={styles.actionButton}
+                  danger
+                />
+              </Space>
+            </div>
           </div>
           <Text
             style={{
