@@ -345,7 +345,9 @@ export default function LipSyncPage() {
 
   const handleSelectCachedVideo = (videoUrl: string) => {
     // Convert the URL to a File object
-    fetch(videoUrl)
+    fetch(videoUrl, {
+      cache: 'reload'
+    })
       .then(res => res.blob())
       .then(blob => {
         const filename = videoUrl.split('/').pop() || 'video.mp4';
