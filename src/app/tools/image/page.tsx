@@ -330,7 +330,9 @@ export default function ImageToVideoPage() {
         
         try {
           // 尝试从URL下载图片并转换为File对象
-          const imgResponse = await fetch(selectedImageUrl);
+          const imgResponse = await fetch(selectedImageUrl, {
+            cache: 'reload'
+          });
           const blob = await imgResponse.blob();
           const file = new File([blob], 'image.png', { type: 'image/png' });
           
