@@ -1,10 +1,10 @@
-/* 复制自Text to Video页面的样式 */
+/* Shared CSS for all tool pages */
 .pageContainer {
   height: 100vh;
   background: #141414;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .header {
@@ -22,7 +22,7 @@
   margin: 0 auto;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-y: visible;
   padding-right: 48px;
 }
 
@@ -118,7 +118,7 @@
   border-radius: 8px;
   padding: 24px;
   overflow-y: auto;
-  height: calc(100vh - 48px);
+  max-height: calc(100vh - 48px);
 }
 
 .rightSection {
@@ -383,6 +383,10 @@
   justify-content: space-between;
 }
 
+.settingItem .sectionTitle {
+  min-width: 80px;
+}
+
 .settingLabel {
   color: #fff;
   font-size: 14px;
@@ -457,20 +461,16 @@
   height: 60px !important;
 }
 
-/* 图片上传相关样式 */
+/* Image upload related styles */
 .imageUploadSection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .uploadContainer {
   width: 100%;
-  position: relative;
-  margin-bottom: 20px;
   height: 180px;
-  min-height: 180px;
-  flex-shrink: 0;
   border: 1px dashed #2a2b2e;
   border-radius: 8px;
   display: flex;
@@ -482,6 +482,7 @@
   transition: all 0.3s;
   background: rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  position: relative;
 }
 
 .uploadContainer:hover {
@@ -502,6 +503,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  border-radius: 8px;
 }
 
 .uploadOverlay {
@@ -535,7 +537,7 @@
   background: var(--primary-hover-color);
 }
 
-/* 删除图片按钮样式 */
+/* Delete image button styles */
 .deleteImageButton {
   position: absolute !important;
   top: 10px;
@@ -556,7 +558,7 @@
   opacity: 1;
 }
 
-/* 添加左侧区域的滚动条样式 */
+/* Add left section scrollbar styles */
 .leftSection::-webkit-scrollbar {
   width: 6px;
 }
@@ -574,10 +576,239 @@
   background: #444;
 }
 
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 12px;
+}
+
+.taskHeader .taskPrompt {
+  flex: 1;
+  margin: 0;
+}
+
+.deleteButton {
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.deleteButton:hover {
+  opacity: 1;
+}
+
+/* Created images list styles */
+.createdImagesSection {
+  margin-top: 8px;
+}
+
+.createdImagesTitle {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.createdImagesListContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.createdImagesList {
+  display: flex;
+  gap: 12px;
+  overflow-x: hidden;
+  padding-bottom: 8px;
+  flex: 1;
+}
+
+.scrollArrow {
+  position: absolute;
+  z-index: 10;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  background: rgba(26, 27, 30, 0.8) !important;
+  color: #fff !important;
+  border: 1px solid #2a2b2e !important;
+  transition: all 0.2s ease;
+}
+
+.scrollArrow:hover {
+  background: #2a2b2e !important;
+  color: var(--primary-color) !important;
+}
+
+.scrollArrow[disabled] {
+  background: rgba(26, 27, 30, 0.5) !important;
+  color: #666 !important;
+  border-color: #222 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.scrollArrow[disabled]:hover {
+  background: rgba(26, 27, 30, 0.5) !important;
+  color: #666 !important;
+  border-color: #222 !important;
+}
+
+.leftArrow {
+  left: -10px;
+}
+
+.rightArrow {
+  right: -10px;
+}
+
+.createdImagesList::-webkit-scrollbar {
+  height: 0;
+  display: none;
+}
+
+.createdImagesList::-webkit-scrollbar-track {
+  display: none;
+}
+
+.createdImagesList::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+.createdImageItem {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  margin: 2px;
+}
+
+.createdImageItem:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.createdImageItem:hover::after {
+  content: "Use this image";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 10px;
+  padding: 4px;
+  text-align: center;
+}
+
+.createdImageItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadLoading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border-radius: 8px;
+}
+
+.uploadLoadingText {
+  color: white;
+  font-size: 12px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.modelSelect {
+  margin-bottom: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.modelSelect :global(.ant-select-selector) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #2a2b2e !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+}
+
+.modelSelect :global(.ant-select-selection-item) {
+  color: #fff !important;
+  line-height: 38px !important;
+}
+
+.modelSelect :global(.ant-select-arrow) {
+  color: #666 !important;
+}
+
+.modelSelect :global(.ant-select-dropdown) {
+  background: #1f1f1f !important;
+  border: 1px solid #2a2b2e !important;
+}
+
+.modelSelect :global(.ant-select-item) {
+  color: #ccc !important;
+  padding: 8px 12px !important;
+  font-family: monospace !important;
+}
+
+.modelSelect :global(.ant-select-item-option-selected) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: #fff !important;
+}
+
+.modelSelect :global(.ant-select-item-option-active:not(.ant-select-item-option-selected)) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Image-specific styles */
+.imageContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.downloadButton {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.downloadButton:hover {
+  opacity: 1;
+}
+
+/* Radio group styles */
 .radioGroup {
   margin-bottom: 16px;
 }
 
+/* Text to speech section styles */
 .textInputSection {
   background: #292b31;
   border-radius: 8px;
@@ -616,7 +847,6 @@
   width: 100%;
 }
 
-/* Wrap global styles within a local class */
 .textInputSection :global(.ant-select-selector) {
   background: #141414 !important;
   border-color: #303030 !important;
@@ -630,14 +860,7 @@
   color: white !important;
 } 
 
-
-/* Make sure the left section is scrollable */
-.leftSection {
-  overflow-y: auto;
-  max-height: 100vh;
-  padding-right: 16px;
-}
-
+/* Cached videos section styles */
 .cachedVideosSection {
   margin-top: 20px;
   width: 100%;
@@ -657,34 +880,20 @@
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.2s;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #2a2b2e;
+  background-color: #1a1b1e;
 }
 
-.cachedVideoItem:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Fix the cached video thumbnails to maintain aspect ratio */
 .cachedVideoThumbnail {
   width: 100%;
   height: 80px;
-  object-fit: contain; /* Changed from 'cover' to 'contain' to preserve aspect ratio */
-  background-color: #000; /* Changed from #f0f0f0 to #000 for better video visibility */
-}
-
-.cachedVideoItem {
-  cursor: pointer;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s;
-  border: 1px solid #2a2b2e; /* Changed from #f0f0f0 to match the dark theme */
-  background-color: #1a1b1e; /* Added background color to match theme */
+  object-fit: contain;
+  background-color: #000;
 }
 
 .cachedVideoInfo {
   padding: 6px;
-  background-color: #1a1b1e; /* Changed from #fafafa to match the dark theme */
+  background-color: #1a1b1e;
 }
 
 .cachedVideoType {
@@ -694,7 +903,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #fff; /* Added color to match theme */
+  color: #fff;
 }
 
 .cachedVideoDate {
@@ -703,7 +912,7 @@
   margin: 0;
 }
 
-/* Add these styles for the video preview and delete buttons */
+/* Video preview styles */
 .videoPreviewContainer {
   width: 100%;
   position: relative;
@@ -719,16 +928,8 @@
   object-fit: contain;
   border-radius: 4px;
   background-color: #000;
-  /* Add this to prevent unnecessary repaints */
   will-change: transform;
 }
-
-/* .uploadContainer {
-  position: relative;
-  margin-bottom: 20px;
-  height: auto;
-  min-height: 180px;
-} */
 
 .uploadedFileInfo {
   display: flex;
@@ -742,12 +943,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 80%;
-}
-
-.deleteVideoButton {
-  border-radius: 4px;
-  margin-left: 8px;
-  z-index: 10;
 }
 
 .topRightDeleteButton {
@@ -765,11 +960,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-.uploadContainer {
-  position: relative;
-  margin-bottom: 20px;
-}
-
+/* Speaker selector styles */
 .speakerSelectContainer {
   display: flex;
   align-items: center;
@@ -793,25 +984,24 @@
   color: #4096ff;
 }
 
-.taskHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+/* Audio styles */
+.audio {
   width: 100%;
-  gap: 12px;
+  border-radius: 8px;
+  background-color: #141414;
 }
 
-.taskHeader .taskPrompt {
-  flex: 1;
-  margin: 0;
+/* Audio length selector styles */
+.audioSecondsSelect {
+  width: 100%;
 }
 
-.deleteButton {
-  flex-shrink: 0;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
+.audioSecondsSelect :global(.ant-select-selector) {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #2a2b2e !important;
+  border-radius: 8px !important;
 }
 
-.deleteButton:hover {
-  opacity: 1;
+.audioSecondsSelect :global(.ant-select-selection-item) {
+  color: #fff !important;
 }

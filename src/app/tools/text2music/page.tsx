@@ -1,18 +1,21 @@
 "use client";
 
-import { Button, Input, Progress, message, Select, Space, Modal } from 'antd';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import styles from './page.module.css';
+import { useState } from 'react';
+import { message, Progress, Button } from 'antd';
 import { backendApi } from '@/network';
 import { InvokeTextToMusicSecsEnum, TaskStatus } from '@/network/api';
-import Image from 'next/image';
-import { API_CONFIG } from '@/configs/api.config';
 import type { Task } from '@/types/task';
+import { useTaskManager } from '../shared/hooks/useTaskManager';
+import {
+  AudioLengthSelector,
+  Placeholder,
+  PromptInput,
+  ToolPageLayout
+} from '../shared/components';
+import styles from '../shared/tools.module.css';
 import { DeleteOutlined } from '@ant-design/icons';
 
-const { TextArea } = Input;
-const TOTAL_TIME = 60; // 1 minutes in seconds
-
+// Audio length options
 const AUDIO_LENGTH_OPTIONS = [
   { value: InvokeTextToMusicSecsEnum._5, label: '5 seconds' },
   { value: InvokeTextToMusicSecsEnum._10, label: '10 seconds' },
@@ -20,172 +23,24 @@ const AUDIO_LENGTH_OPTIONS = [
   { value: InvokeTextToMusicSecsEnum._20, label: '20 seconds' },
 ];
 
-interface TaskTimerStatus {
-  timer: NodeJS.Timeout;
-  startTime: number;
-  progress: number;
-}
-
-const formatRemainingTime = (progress: number | undefined) => {
-  if (progress === undefined || progress === 0) return '';
-  if (progress >= 99) return '< 1 min';
-  
-  const remainingSeconds = TOTAL_TIME * (1 - progress / 100);
-  const minutes = Math.floor(remainingSeconds / 60);
-  const seconds = Math.floor(remainingSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-};
-
-const PlaceholderContent = () => (
-  <div className={styles.taskList}>
-    <div className={styles.placeholder}>
-      <Image
-        src="/create_guide.svg"
-        alt="Start Creating"
-        width={240}
-        height={240}
-        priority
-      />
-      <p>Create your first music!</p>
-    </div>
-  </div>
-);
-
 export default function TextToMusicPage() {
   const [prompt, setPrompt] = useState('');
   const [audioSeconds, setAudioSeconds] = useState<InvokeTextToMusicSecsEnum>(InvokeTextToMusicSecsEnum._5);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isClient, setIsClient] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const taskStatusRef = useRef<{ [key: string]: TaskTimerStatus }>({});
 
-  useEffect(() => {
-    setIsClient(true);
-    const savedTasks = localStorage.getItem('tasks');
-    if (savedTasks) {
-      try {
-        const parsedTasks = JSON.parse(savedTasks);
-        let filterTasks = parsedTasks.filter((task) => {
-          return  task.taskType === 'text_to_music';
-        });
-      
-        setTasks(filterTasks);
-        filterTasks.forEach((task: Task) => {
-          if (task.status === TaskStatus.Processing || task.status === TaskStatus.Pending) {
-            checkTaskStatus(task);
-          }
-        });
-      } catch (error) {
-        console.error('Failed to parse tasks:', error);
-      }
-    }
-  }, []);
-
-// 保存任务到 localStorage
-const saveTasks = useCallback((newTasks: Task[]) => {
-  const existingTasksStr = localStorage.getItem('tasks');
-  let allTasks: Task[] = [];
-  
-  if (existingTasksStr) {
-    try {
-      const existingTasks = JSON.parse(existingTasksStr);
-      // Filter out any tasks that would be duplicated by the new tasks
-      allTasks = existingTasks.filter((task: Task) => 
-        !newTasks.some(newTask => newTask.id === task.id)
-      );
-    } catch (error) {
-      console.error('Failed to parse existing tasks:', error);
-    }
-  }
-  
-  // Combine existing tasks with new tasks
-  const combinedTasks = [...newTasks, ...allTasks];
-  localStorage.setItem('tasks', JSON.stringify(combinedTasks));
-  setTasks(newTasks);
-}, []);
-
-// 更新任务状态
-const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) => {
-  setTasks(prevTasks => {
-    const newTasks = prevTasks.map(task => 
-      task.id === taskId ? { ...task, ...updates } : task
-    );
-    const existingTasksStr = localStorage.getItem('tasks');
-    let allTasks: Task[] = [];
-    
-    if (existingTasksStr) {
-      try {
-        const existingTasks = JSON.parse(existingTasksStr);
-        // Filter out any tasks that would be duplicated by the new tasks
-        allTasks = existingTasks.filter((task: Task) => 
-          !newTasks.some(newTask => newTask.id === task.id)
-        );
-      } catch (error) {
-        console.error('Failed to parse existing tasks:', error);
-      }
-    }
-    
-    // Combine existing tasks with new tasks
-    const combinedTasks = [...newTasks, ...allTasks];
-    localStorage.setItem('tasks', JSON.stringify(combinedTasks));
-    return newTasks;
+  const {
+    tasks,
+    isClient,
+    loading,
+    setLoading,
+    taskStatusRef,
+    saveTasks,
+    checkTaskStatus,
+    handleDeleteTask,
+    formatRemainingTime
+  } = useTaskManager({
+    taskType: 'text_to_music',
+    totalTime: 60 // Music generation is quicker than video
   });
-}, []);
-
-  const checkTaskStatus = useCallback((task: Task) => {
-    if (!task) return;
-    const taskId = task.id;
-    
-    // Prevent multiple polling for the same task
-    if (taskStatusRef.current[taskId]?.timer) {
-      return;
-    }
-
-    taskStatusRef.current[taskId] = {
-      startTime: task.createdAt / 1000,
-      progress: 0,
-      timer: setInterval(() => {
-        const now = Date.now() / 1000;
-        const elapsed = Math.floor(now - taskStatusRef.current[taskId].startTime);
-        const percentage = Math.min((elapsed / TOTAL_TIME) * 100, 99);
-        
-        taskStatusRef.current[taskId].progress = percentage;
-        updateTaskStatus(taskId, { status: TaskStatus.Processing });
-
-        if (elapsed % 30 === 0) { // Check every 30 seconds
-          backendApi.getTaskStatus(taskId).then((response) => {
-            if (response.status === 200) {
-              if (response.data.status === TaskStatus.Completed) {
-                const audioUrl = API_CONFIG.getAudioUrl(taskId);
-                updateTaskStatus(taskId, { 
-                  status: TaskStatus.Completed,
-                  audioUrl 
-                });
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-              } else if (response.data.status === TaskStatus.Failed) {
-                updateTaskStatus(taskId, { 
-                  status: TaskStatus.Failed,
-                  error: response.data.error || 'Failed to generate audio'
-                });
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-                message.error({
-                  content: response.data.error || 'Failed to generate audio',
-                  duration: 5,
-                  style: { marginTop: '20vh' }
-                });
-              }
-            }
-          });
-        }
-      }, 1000)
-    };
-  }, [updateTaskStatus]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -212,12 +67,6 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
           checkTaskStatus(newTask);
           setPrompt('');
         }
-      } else {
-        message.error({
-          content: 'Failed to generate audio',
-          duration: 5,
-          style: { marginTop: '20vh' }
-        });
       }
     } catch (error) {
       message.error({
@@ -230,188 +79,110 @@ const updateTaskStatus = useCallback((taskId: string, updates: Partial<Task>) =>
     }
   };
 
-  useEffect(() => {
-    return () => {
-      // Cleanup all timers on unmount
-      Object.values(taskStatusRef.current).forEach(status => {
-        if (status.timer) {
-          clearInterval(status.timer);
-        }
-      });
-      taskStatusRef.current = {};
-    };
-  }, []);
+  const isGenerateDisabled = !prompt.trim() || loading;
 
-  // Add effect to cleanup timers for completed or failed tasks
-  useEffect(() => {
-    tasks.forEach(task => {
-      if ((task.status === TaskStatus.Completed || task.status === TaskStatus.Failed) && 
-          taskStatusRef.current[task.id]?.timer) {
-        clearInterval(taskStatusRef.current[task.id].timer);
-        delete taskStatusRef.current[task.id];
-      }
-    });
-  }, [tasks]);
+  // Custom task list for audio content
+  const renderTaskList = () => {
+    if (tasks.length === 0) {
+      return <Placeholder />;
+    }
 
-  const isPromptEmpty = !prompt.trim();
-
-  const handleDeleteTask = useCallback((taskId: string) => {
-    Modal.confirm({
-      title: 'Delete Task',
-      content: 'Are you sure you want to delete this task? This action cannot be undone.',
-      okText: 'Delete',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: () => {
-        // Remove from local state immediately
-        setTasks(prevTasks => {
-          const newTasks = prevTasks.filter(task => task.id !== taskId);
-          
-          // Update localStorage
-          const existingTasksStr = localStorage.getItem('tasks');
-          if (existingTasksStr) {
-            try {
-              const existingTasks = JSON.parse(existingTasksStr);
-              const updatedTasks = existingTasks.filter((task: Task) => task.id !== taskId);
-              localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-            } catch (error) {
-              console.error('Failed to update tasks in localStorage:', error);
-            }
-          }
-          
-          return newTasks;
-        });
-
-        // Clear the timer if it exists
-        if (taskStatusRef.current[taskId]?.timer) {
-          clearInterval(taskStatusRef.current[taskId].timer);
-          delete taskStatusRef.current[taskId];
-        }
-
-        message.success('Task deleted successfully');
-
-        // Call backend API in the background
-        backendApi.deleteTask(taskId).catch(error => {
-          console.error('Error deleting task from backend:', error);
-        });
-      },
-    });
-  }, []);
-
-  if (!isClient) {
-    return null;
-  }
-
-  return (
-    <div className={styles.pageContainer}>
-      <div className={styles.mainContent}>
-        <div className={styles.leftSection}>
-          <div className={styles.sectionTitle}>
-            <span className={styles.icon}>✨</span>
-            <span>Prompt</span>
-          </div>
-          <div className={styles.inputWrapper}>
-            <TextArea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe the music you want to create..."
-              className={styles.input}
-              disabled={loading}
-            />
-          </div>
-          
-          <div className={styles.settingsSection}>
-            <div className={styles.sectionTitle}>
-              <span className={styles.icon}>⚙️</span>
-              <span>Settings</span>
+    return (
+      <div className={styles.taskList}>
+        {tasks.map(task => (
+          <div key={task.id} className={styles.taskItem}>
+            <div className={styles.taskContent}>
+              {task.status === TaskStatus.Processing ? (
+                <div className={styles.progressContainer}>
+                  <Progress 
+                    percent={taskStatusRef.current[task.id]?.progress || 0}
+                    strokeColor={{
+                      '0%': '#1668dc',
+                      '100%': '#1677ff',
+                    }}
+                    format={(percent) => (
+                      <span className={styles.progressText}>
+                        Generating Music... {formatRemainingTime(percent)}
+                      </span>
+                    )}
+                  />
+                </div>
+              ) : task.status === TaskStatus.Completed && task.audioUrl ? (
+                <audio
+                  controls
+                  className={styles.audio}
+                  src={task.audioUrl}
+                >
+                  Your browser does not support audio playback
+                </audio>
+              ) : task.status === TaskStatus.Failed ? (
+                <div className={styles.errorContainer}>
+                  <p className={styles.errorText}>{task.error || 'Failed to generate audio'}</p>
+                </div>
+              ) : null}
             </div>
-            <div className={styles.settingsContent}>
-              <div className={styles.settingItem}>
-                <span className={styles.settingLabel}>
-                  Music Length
-                </span>
-                <Select
-                  value={audioSeconds}
-                  onChange={(value) => setAudioSeconds(value)}
-                  options={AUDIO_LENGTH_OPTIONS}
-                  className={styles.audioSecondsSelect}
-                  disabled={loading}
+            <div className={styles.taskInfo}>
+              <div className={styles.taskHeader}>
+                <p className={styles.taskPrompt}>{task.prompt}</p>
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDeleteTask(task.id)}
+                  className={styles.deleteButton}
+                  danger
                 />
               </div>
+              <p className={styles.taskTime}>
+                {new Date(task.createdAt).toLocaleString()}
+              </p>
             </div>
           </div>
+        ))}
+      </div>
+    );
+  };
+  
+  // Prepare the placeholder content
+  const placeholderContent = (
+    <Placeholder />
+  );
 
-          <div className={styles.buttonGroup}>
-            <Button
-              type="primary"
-              onClick={handleGenerate}
-              loading={loading}
-              disabled={isPromptEmpty || loading}
-              className={styles.generateButton}
-            >
-              Create
-            </Button>
-          </div>
+  // Prepare the left section content (form)
+  const leftSectionContent = (
+    <>
+      <PromptInput
+        value={prompt}
+        onChange={setPrompt}
+        disabled={loading}
+        placeholder="Describe the music you want to create..."
+      />
+      
+      <div className={styles.settingsSection}>
+        <div className={styles.sectionTitle}>
+          <span className={styles.icon}>⚙️</span>
+          <span>Settings</span>
         </div>
-
-        <div className={styles.rightSection}>
-          {tasks.length > 0 ? (
-            <div className={styles.taskList}>
-              {tasks.map(task => (
-                <div key={task.id} className={styles.taskItem}>
-                  <div className={styles.taskContent}>
-                    {task.status === TaskStatus.Processing ? (
-                      <div className={styles.progressContainer}>
-                        <Progress 
-                          percent={taskStatusRef.current[task.id]?.progress || 0}
-                          strokeColor={{
-                            '0%': '#1668dc',
-                            '100%': '#1677ff',
-                          }}
-                          format={(percent) => (
-                            <span className={styles.progressText}>
-                              Generating Music... {formatRemainingTime(percent)}
-                            </span>
-                          )}
-                        />
-                      </div>
-                    ) : task.status === TaskStatus.Completed && task.audioUrl ? (
-                      <audio
-                        controls
-                        className={styles.audio}
-                        src={task.audioUrl}
-                      >
-                        Your browser does not support audio playback
-                      </audio>
-                    ) : task.status === TaskStatus.Failed ? (
-                      <div className={styles.errorContainer}>
-                        <p className={styles.errorText}>{task.error || 'Failed to generate audio'}</p>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className={styles.taskInfo}>
-                    <div className={styles.taskHeader}>
-                      <p className={styles.taskPrompt}>{task.prompt}</p>
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDeleteTask(task.id)}
-                        className={styles.deleteButton}
-                        danger
-                      />
-                    </div>
-                    <p className={styles.taskTime}>
-                      {new Date(task.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <PlaceholderContent />
-          )}
+        <div className={styles.settingsContent}>
+          <AudioLengthSelector
+            value={audioSeconds}
+            onChange={(value: InvokeTextToMusicSecsEnum) => setAudioSeconds(value)}
+            options={AUDIO_LENGTH_OPTIONS}
+            disabled={loading}
+          />
         </div>
       </div>
-    </div>
+    </>
   );
-} 
+
+  return (
+    <ToolPageLayout
+      leftSection={leftSectionContent}
+      rightSection={renderTaskList()}
+      isClient={isClient}
+      loading={loading}
+      onGenerate={handleGenerate}
+      isGenerateDisabled={isGenerateDisabled}
+      placeholderContent={placeholderContent}
+    />
+  );
+}
