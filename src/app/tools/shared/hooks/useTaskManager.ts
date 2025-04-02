@@ -138,7 +138,7 @@ export const useTaskManager = ({
         updateTaskStatus(taskId, { status: TaskStatus.Processing });
 
         // Check status periodically
-        const checkInterval = taskType === 'text_to_image' ? 5 : 60; // More frequent checks for images
+        const checkInterval = 5; // 5 seconds interval for all task types
         if (elapsed % checkInterval === 0) {
           backendApi.getTaskStatus(taskId).then((response) => {
             if (response.status === 200) {
@@ -152,6 +152,8 @@ export const useTaskManager = ({
                   updates.videoUrl = API_CONFIG.getVideoUrl(taskId);
                 } else if (taskType === 'text_to_image') {
                   updates.imageUrl = API_CONFIG.getImageUrl(taskId);
+                } else if (taskType === 'text_to_music') {
+                  updates.audioUrl = API_CONFIG.getAudioUrl(taskId);
                 }
                 
                 updateTaskStatus(taskId, updates);

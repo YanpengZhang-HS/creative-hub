@@ -12,7 +12,7 @@ interface TaskListProps {
   onDeleteTask: (taskId: string) => void;
   onDownloadTask?: (task: Task) => void;
   emptyContent: React.ReactNode;
-  mediaType: 'video' | 'image';
+  mediaType: 'video' | 'image' | 'audio';
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -41,7 +41,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 <Progress 
                   type="circle" 
                   percent={taskStatusRef.current[task.id]?.progress || 0}
-                  format={(percent) => formatRemainingTime(percent)}
+                  format={(percent) => `${Math.round(percent || 0)}%`}
                   strokeColor={{
                     '0%': '#1668dc',
                     '100%': '#1677ff',
@@ -85,6 +85,15 @@ const TaskList: React.FC<TaskListProps> = ({
                       />
                     )}
                   </div>
+                )}
+                {mediaType === 'audio' && task.audioUrl && (
+                  <audio
+                    controls
+                    className={styles.audio}
+                    src={task.audioUrl}
+                  >
+                    Your browser does not support audio playback
+                  </audio>
                 )}
               </>
             ) : task.status === TaskStatus.Failed ? (

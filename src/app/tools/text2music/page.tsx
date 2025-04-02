@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from 'react';
-import { message, Progress, Button } from 'antd';
+import { message } from 'antd';
 import { backendApi } from '@/network';
-import { InvokeTextToMusicSecsEnum, TaskStatus } from '@/network/api';
+import { InvokeTextToMusicSecsEnum } from '@/network/api';
 import type { Task } from '@/types/task';
 import { useTaskManager } from '../shared/hooks/useTaskManager';
 import {
   AudioLengthSelector,
   Placeholder,
   PromptInput,
+  TaskList,
   ToolPageLayout
 } from '../shared/components';
 import styles from '../shared/tools.module.css';
-import { DeleteOutlined } from '@ant-design/icons';
 
 // Audio length options
 const AUDIO_LENGTH_OPTIONS = [
@@ -80,71 +80,22 @@ export default function TextToMusicPage() {
   };
 
   const isGenerateDisabled = !prompt.trim() || loading;
-
-  // Custom task list for audio content
-  const renderTaskList = () => {
-    if (tasks.length === 0) {
-      return <Placeholder />;
-    }
-
-    return (
-      <div className={styles.taskList}>
-        {tasks.map(task => (
-          <div key={task.id} className={styles.taskItem}>
-            <div className={styles.taskContent}>
-              {task.status === TaskStatus.Processing ? (
-                <div className={styles.progressContainer}>
-                  <Progress 
-                    percent={taskStatusRef.current[task.id]?.progress || 0}
-                    strokeColor={{
-                      '0%': '#1668dc',
-                      '100%': '#1677ff',
-                    }}
-                    format={(percent) => (
-                      <span className={styles.progressText}>
-                        Generating Music... {formatRemainingTime(percent)}
-                      </span>
-                    )}
-                  />
-                </div>
-              ) : task.status === TaskStatus.Completed && task.audioUrl ? (
-                <audio
-                  controls
-                  className={styles.audio}
-                  src={task.audioUrl}
-                >
-                  Your browser does not support audio playback
-                </audio>
-              ) : task.status === TaskStatus.Failed ? (
-                <div className={styles.errorContainer}>
-                  <p className={styles.errorText}>{task.error || 'Failed to generate audio'}</p>
-                </div>
-              ) : null}
-            </div>
-            <div className={styles.taskInfo}>
-              <div className={styles.taskHeader}>
-                <p className={styles.taskPrompt}>{task.prompt}</p>
-                <Button
-                  type="text"
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDeleteTask(task.id)}
-                  className={styles.deleteButton}
-                  danger
-                />
-              </div>
-              <p className={styles.taskTime}>
-                {new Date(task.createdAt).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
   
   // Prepare the placeholder content
   const placeholderContent = (
     <Placeholder />
+  );
+
+  // Prepare the task list content
+  const taskListContent = (
+    <TaskList
+      tasks={tasks}
+      taskStatusRef={taskStatusRef}
+      formatRemainingTime={formatRemainingTime}
+      onDeleteTask={handleDeleteTask}
+      emptyContent={placeholderContent}
+      mediaType="audio"
+    />
   );
 
   // Prepare the left section content (form)
@@ -177,7 +128,7 @@ export default function TextToMusicPage() {
   return (
     <ToolPageLayout
       leftSection={leftSectionContent}
-      rightSection={renderTaskList()}
+      rightSection={taskListContent}
       isClient={isClient}
       loading={loading}
       onGenerate={handleGenerate}
