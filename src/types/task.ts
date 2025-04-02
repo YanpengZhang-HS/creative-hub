@@ -33,5 +33,6 @@ export interface Task {
   imageUrl?: string;
   audioUrl?: string;
   error?: string;
+  progress?: number;
   aspectRatio?: InvokeTextToVideoAspectRatioEnum | InvokeImageToVideoAspectRatioEnum;
 }

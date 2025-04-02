@@ -126,71 +126,81 @@ export const useTaskManager = ({
       return;
     }
 
+    // Initialize task status in ref
     taskStatusRef.current[taskId] = {
       startTime: task.createdAt / 1000,
       progress: 0,
       timer: setInterval(() => {
-        const now = Date.now() / 1000;
-        const elapsed = Math.floor(now - taskStatusRef.current[taskId].startTime);
-        const percentage = Math.min((elapsed / totalTime) * 100, 99);
-        
-        taskStatusRef.current[taskId].progress = percentage;
-        updateTaskStatus(taskId, { status: TaskStatus.Processing });
-
-        // Check status periodically
-        const checkInterval = 5; // 5 seconds interval for all task types
-        if (elapsed % checkInterval === 0) {
-          backendApi.getTaskStatus(taskId).then((response) => {
-            if (response.status === 200) {
-              if (response.data.status === TaskStatus.Completed) {
-                let updates: Partial<Task> = { 
-                  status: TaskStatus.Completed 
-                };
-                
-                // Get URL based on task type
-                if (taskType === 'text_to_video' || taskType === 'image_to_video') {
-                  updates.videoUrl = API_CONFIG.getVideoUrl(taskId);
-                } else if (taskType === 'text_to_image') {
-                  updates.imageUrl = API_CONFIG.getImageUrl(taskId);
-                } else if (taskType === 'text_to_music') {
-                  updates.audioUrl = API_CONFIG.getAudioUrl(taskId);
-                }
-                
-                updateTaskStatus(taskId, updates);
-                
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-                
-                if (onStatusCheck) {
-                  onStatusCheck(taskId, TaskStatus.Completed);
-                }
-              } else if (response.data.status === TaskStatus.Failed) {
-                updateTaskStatus(taskId, { 
-                  status: TaskStatus.Failed,
-                  error: response.data.error || `Failed to generate ${taskType.replace('_to_', ' to ')}`
-                });
-                
-                if (taskStatusRef.current[taskId]?.timer) {
-                  clearInterval(taskStatusRef.current[taskId].timer);
-                  delete taskStatusRef.current[taskId];
-                }
-                
-                message.error({
-                  content: response.data.error || `Failed to generate ${taskType.replace('_to_', ' to ')}`,
-                  duration: 5,
-                  style: { marginTop: '20vh' }
-                });
-                
-                if (onStatusCheck) {
-                  onStatusCheck(taskId, TaskStatus.Failed);
-                }
+        // Call API to check status
+        backendApi.getTaskStatus(taskId).then((response) => {
+          if (response.status === 200) {
+            // Use actual progress from API if available, otherwise calculate based on time
+            if (response.data.progress !== null && response.data.progress !== undefined) {
+              taskStatusRef.current[taskId].progress = response.data.progress;
+            } else {
+              // Fall back to time-based calculation if progress not provided
+              const now = Date.now() / 1000;
+              const elapsed = Math.floor(now - taskStatusRef.current[taskId].startTime);
+              const percentage = Math.min((elapsed / totalTime) * 100, 99);
+              taskStatusRef.current[taskId].progress = percentage;
+            }
+            
+            // Update task status based on API response
+            updateTaskStatus(taskId, { status: response.data.status });
+            
+            // Handle completed tasks
+            if (response.data.status === TaskStatus.Completed) {
+              let updates: Partial<Task> = { 
+                status: TaskStatus.Completed 
+              };
+              
+              // Get URL based on task type
+              if (taskType === 'text_to_video' || taskType === 'image_to_video') {
+                updates.videoUrl = API_CONFIG.getVideoUrl(taskId);
+              } else if (taskType === 'text_to_image') {
+                updates.imageUrl = API_CONFIG.getImageUrl(taskId);
+              } else if (taskType === 'text_to_music') {
+                updates.audioUrl = API_CONFIG.getAudioUrl(taskId);
+              }
+              
+              updateTaskStatus(taskId, updates);
+              
+              if (taskStatusRef.current[taskId]?.timer) {
+                clearInterval(taskStatusRef.current[taskId].timer);
+                delete taskStatusRef.current[taskId];
+              }
+              
+              if (onStatusCheck) {
+                onStatusCheck(taskId, TaskStatus.Completed);
+              }
+            } 
+            // Handle failed tasks
+            else if (response.data.status === TaskStatus.Failed) {
+              updateTaskStatus(taskId, { 
+                status: TaskStatus.Failed,
+                error: response.data.error || `Failed to generate ${taskType.replace('_to_', ' to ')}`
+              });
+              
+              if (taskStatusRef.current[taskId]?.timer) {
+                clearInterval(taskStatusRef.current[taskId].timer);
+                delete taskStatusRef.current[taskId];
+              }
+              
+              message.error({
+                content: response.data.error || `Failed to generate ${taskType.replace('_to_', ' to ')}`,
+                duration: 5,
+                style: { marginTop: '20vh' }
+              });
+              
+              if (onStatusCheck) {
+                onStatusCheck(taskId, TaskStatus.Failed);
               }
             }
-          });
-        }
-      }, 1000)
+          }
+        }).catch(error => {
+          console.error(`Error checking status for task ${taskId}:`, error);
+        });
+      }, 5000) // Check every 5 seconds for all task types
     };
   }, [updateTaskStatus, taskType, totalTime, onStatusCheck]);
 

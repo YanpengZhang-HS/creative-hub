@@ -32,78 +32,84 @@ const TaskList: React.FC<TaskListProps> = ({
     <div className={styles.taskList}>
       {tasks.map(task => (
         <div key={task.id} className={styles.taskItem}>
-          <div 
+            <div 
             className={styles.taskContent}
             data-aspect-ratio={task.aspectRatio || "16:9"}
-          >
-            {task.status === TaskStatus.Processing ? (
+            >
+            {task.status === TaskStatus.Pending ? (
               <div className={styles.progressContainer}>
-                <Progress 
-                  type="circle" 
-                  percent={taskStatusRef.current[task.id]?.progress || 0}
-                  format={(percent) => `${Math.round(percent || 0)}%`}
-                  strokeColor={{
-                    '0%': '#1668dc',
-                    '100%': '#1677ff',
-                  }}
-                />
-                <p className={styles.progressText}>
-                  Generating {mediaType}...
-                </p>
+              <p className={styles.progressText}>
+                In Queue
+              </p>
+              </div>
+            ) : task.status === TaskStatus.Processing ? (
+              <div className={styles.progressContainer}>
+              <Progress 
+                type="circle" 
+                percent={taskStatusRef.current[task.id]?.progress || 0}
+                format={(percent) => `${Math.round(percent || 0)}%`}
+                strokeColor={{
+                '0%': '#1668dc',
+                '100%': '#1677ff',
+                }}
+              />
+              <p className={styles.progressText}>
+                Generating {mediaType}...
+              </p>
               </div>
             ) : task.status === TaskStatus.Completed ? (
               <>
-                {mediaType === 'video' && task.videoUrl && (
-                  <video
-                    controls
-                    className={styles.video}
-                    src={task.videoUrl}
-                  >
-                    Your browser does not support video playback
-                  </video>
+              {mediaType === 'video' && task.videoUrl && (
+                <video
+                controls
+                className={styles.video}
+                src={task.videoUrl}
+                >
+                Your browser does not support video playback
+                </video>
+              )}
+              {mediaType === 'image' && task.imageUrl && (
+                <div className={styles.imageContainer}>
+                <img
+                  src={task.imageUrl}
+                  alt={task.prompt}
+                  style={{
+                  width: 'auto',
+                  height: '100%',
+                  borderRadius: '8px'
+                  }}
+                />
+                {onDownloadTask && (
+                  <Button
+                  type="primary"
+                  icon={<DownloadOutlined />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDownloadTask(task);
+                  }}
+                  className={styles.downloadButton}
+                  />
                 )}
-                {mediaType === 'image' && task.imageUrl && (
-                  <div className={styles.imageContainer}>
-                    <img
-                      src={task.imageUrl}
-                      alt={task.prompt}
-                      style={{
-                        width: 'auto',
-                        height: '100%',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    {onDownloadTask && (
-                      <Button
-                        type="primary"
-                        icon={<DownloadOutlined />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDownloadTask(task);
-                        }}
-                        className={styles.downloadButton}
-                      />
-                    )}
-                  </div>
-                )}
-                {mediaType === 'audio' && task.audioUrl && (
-                  <audio
-                    controls
-                    className={styles.audio}
-                    src={task.audioUrl}
-                  >
-                    Your browser does not support audio playback
-                  </audio>
-                )}
+                </div>
+              )}
+              {mediaType === 'audio' && task.audioUrl && (
+                <audio
+                controls
+                className={styles.audio}
+                src={task.audioUrl}
+                >
+                Your browser does not support audio playback
+                </audio>
+              )}
               </>
             ) : task.status === TaskStatus.Failed ? (
               <div className={styles.errorContainer}>
-                <p className={styles.errorText}>
-                  {task.error || `Failed to generate ${mediaType}`}
-                </p>
+              <p className={styles.errorText}>
+                {task.error || `Failed to generate ${mediaType}`}
+              </p>
               </div>
             ) : null}
-          </div>
+            </div>
           <div className={styles.taskInfo}>
             <div className={styles.taskHeader}>
               <p className={styles.taskPrompt}>{task.prompt}</p>

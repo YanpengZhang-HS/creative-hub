@@ -31,8 +31,8 @@ export const topCreations: TopCreation[] = [
     videoUrl: "http://34.227.168.212:8000/api/v1/tasks/9134cbe8-6fc6-414a-8227-ff6e9e41817d/files/output%2Foutput.mp4" // Replace with actual video URL
   },
   {
-    title: "Rain falls",
-    description: "Rain falls on a quiet city street at twilight, with each droplet capturing and refracting the glow of vintage streetlamps. Puddles mirror the moody sky above, while passing umbrellas add splashes of color to the reflective scene.",
-    videoUrl: "http://34.227.168.212:8000/api/v1/tasks/4b070dff-a638-40a3-9f2d-540ed93e6783/files/output%2Foutput.mp4" // Replace with actual video URL
+    title: "Spiderman fights with Trump",
+    description: "Spiderman fights with Trump.",
+    videoUrl: "http://34.227.168.212:8000/api/v1/tasks/cf46db13-9cca-485a-b50e-279998141a57/files/output%2Foutput.mp4" // Replace with actual video URL
   }
 ]; 
