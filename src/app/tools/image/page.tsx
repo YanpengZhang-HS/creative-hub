@@ -264,7 +264,8 @@ export default function ImageToVideoPage() {
   // Prepare the model options
   const modelOptions = [
     { value: MLPipelineEnum.SkyreelsImageToVideoV1 },
-    { value: MLPipelineEnum.CosmosImageToVideoV1 }
+    { value: MLPipelineEnum.CosmosImageToVideoV1 },
+    { value: MLPipelineEnum.WanImageToVideoV1 }
   ];
 
   // Prepare the placeholder content with aspectRatio

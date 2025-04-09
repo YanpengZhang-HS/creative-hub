@@ -53,7 +53,9 @@ export const MLPipelineEnum = {
     MmaudioSoundEffectV1: 'mmaudio_sound_effect_v1',
     SkyreelsTextToVideoV1: 'skyreels_text_to_video_v1',
     SkyreelsImageToVideoV1: 'skyreels_image_to_video_v1',
-    MusicgptTextToMusicV1: 'musicgpt_text_to_music_v1'
+    MusicgptTextToMusicV1: 'musicgpt_text_to_music_v1',
+    WanTextToVideoV1: 'wan_text_to_video_v1',
+    WanImageToVideoV1: 'wan_image_to_video_v1'
 } as const;
 
 export type MLPipelineEnum = typeof MLPipelineEnum[keyof typeof MLPipelineEnum];
@@ -373,14 +375,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {File} [audioFile] wav音频文件（最大25MB）
          * @param {string} [prompt] 
-         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
-         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
-         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
-         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_women_3\\\&quot;, \\\&quot;Indian_man_1\\\&quot;, \\\&quot;Indian_man_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync: async (videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invokeLipSync: async (videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, speaker?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'videoFile' is not null or undefined
             assertParamExists('invokeLipSync', 'videoFile', videoFile)
             const localVarPath = `/api/v1/task/lip_sync`;
@@ -411,18 +410,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             if (prompt !== undefined) { 
                 localVarFormParams.append('prompt', prompt as any);
-            }
-    
-            if (emotion !== undefined) { 
-                localVarFormParams.append('emotion', emotion as any);
-            }
-    
-            if (language !== undefined) { 
-                localVarFormParams.append('language', language as any);
-            }
-    
-            if (speed !== undefined) { 
-                localVarFormParams.append('speed', speed as any);
             }
     
             if (speaker !== undefined) { 
@@ -832,15 +819,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {File} [audioFile] wav音频文件（最大25MB）
          * @param {string} [prompt] 
-         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
-         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
-         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
-         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_women_3\\\&quot;, \\\&quot;Indian_man_1\\\&quot;, \\\&quot;Indian_man_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options);
+        async invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, speaker?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TaskInfo>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, speaker, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.invokeLipSync']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -999,15 +983,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
          * @param {File} [audioFile] wav音频文件（最大25MB）
          * @param {string} [prompt] 
-         * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
-         * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
-         * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
-         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_women_3\\\&quot;, \\\&quot;Indian_man_1\\\&quot;, \\\&quot;Indian_man_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
+         * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
-            return localVarFp.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(axios, basePath));
+        invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, speaker?: string, options?: RawAxiosRequestConfig): AxiosPromise<TaskInfo> {
+            return localVarFp.invokeLipSync(videoFile, mlPipeline, audioFile, prompt, speaker, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1153,16 +1134,13 @@ export class DefaultApi extends BaseAPI {
      * @param {MLPipelineEnum} [mlPipeline] 使用的模型变体
      * @param {File} [audioFile] wav音频文件（最大25MB）
      * @param {string} [prompt] 
-     * @param {string} [emotion] 情感风格，choices&#x3D;[\\\&quot;happy1\\\&quot;, \\\&quot;happy2\\\&quot;, \\\&quot;angry1\\\&quot;, \\\&quot;angry2\\\&quot;, \\\&quot;sad\\\&quot;, \\\&quot;coquettish\\\&quot;]
-     * @param {string} [language] 语言，choices&#x3D;[\\\&quot;Chinese\\\&quot;, \\\&quot;English\\\&quot;, \\\&quot;Korean\\\&quot;, \\\&quot;Japanese\\\&quot;]
-     * @param {string} [speed] 语速，choices&#x3D;[\\\&quot;slow1\\\&quot;, \\\&quot;slow2\\\&quot;, \\\&quot;fast1\\\&quot;, \\\&quot;fast2\\\&quot;]
-     * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_1\\\&quot;, \\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_women_3\\\&quot;, \\\&quot;Indian_man_1\\\&quot;, \\\&quot;Indian_man_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
+     * @param {string} [speaker] 说话人ID,choices&#x3D;[\\\&quot;Indian_women_2\\\&quot;, \\\&quot;Indian_man_3\\\&quot;]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, emotion?: string, language?: string, speed?: string, speaker?: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).invokeLipSync(videoFile, mlPipeline, audioFile, prompt, emotion, language, speed, speaker, options).then((request) => request(this.axios, this.basePath));
+    public invokeLipSync(videoFile: File, mlPipeline?: MLPipelineEnum, audioFile?: File, prompt?: string, speaker?: string, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).invokeLipSync(videoFile, mlPipeline, audioFile, prompt, speaker, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
