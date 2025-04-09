@@ -155,7 +155,7 @@ export const useTaskManager = ({
               };
               
               // Get URL based on task type
-              if (taskType === 'text_to_video' || taskType === 'image_to_video') {
+              if (taskType === 'text_to_video' || taskType === 'image_to_video' || taskType === 'lip_sync' || taskType === 'sound_effect') {
                 updates.videoUrl = API_CONFIG.getVideoUrl(taskId);
               } else if (taskType === 'text_to_image') {
                 updates.imageUrl = API_CONFIG.getImageUrl(taskId);
