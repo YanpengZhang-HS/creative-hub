@@ -53,7 +53,9 @@ export const MLPipelineEnum = {
     MmaudioSoundEffectV1: 'mmaudio_sound_effect_v1',
     SkyreelsTextToVideoV1: 'skyreels_text_to_video_v1',
     SkyreelsImageToVideoV1: 'skyreels_image_to_video_v1',
-    MusicgptTextToMusicV1: 'musicgpt_text_to_music_v1'
+    MusicgptTextToMusicV1: 'musicgpt_text_to_music_v1',
+    WanTextToVideoV1: 'wan_text_to_video_v1',
+    WanImageToVideoV1: 'wan_image_to_video_v1'
 } as const;
 
 export type MLPipelineEnum = typeof MLPipelineEnum[keyof typeof MLPipelineEnum];

@@ -88,7 +88,8 @@ export default function TextToVideoPage() {
   // Prepare the model options
   const modelOptions = [
     { value: MLPipelineEnum.SkyreelsTextToVideoV1 },
-    { value: MLPipelineEnum.CosmosTextToVideoV1 }
+    { value: MLPipelineEnum.CosmosTextToVideoV1 },
+    { value: MLPipelineEnum.WanTextToVideoV1 }
   ];
 
   // Prepare the placeholder content
