@@ -1,0 +1,81 @@
+# Project Guidelines
+
+## Task Formatting
+- Start tasks with a clear, concise action verb
+- Specify file paths relative to project root
+- Include relevant context and constraints
+- Use code blocks for code snippets
+- Flag any performance, security or compatibility requirements
+
+## Code Style & Patterns
+- Use 2 spaces for indentation
+- Use semicolons at the end of statements
+- Use single quotes for strings
+- Use PascalCase for components and interfaces
+- Use camelCase for variables and functions
+- Use UPPER_SNAKE_CASE for constants
+- Place imports in groups: React, external, internal
+- Use named exports over default exports
+- Break lines at 80 characters
+- Use async/await over .then()
+- Add trailing commas in multiline objects/arrays
+- Use explicit type annotations for function parameters
+
+## Code Generation
+- Follow project's existing coding style and patterns
+- Use TypeScript for type safety where applicable 
+- Write self-documenting code with clear variable/function names
+- Keep functions small and focused
+- Add appropriate error handling
+- Include input validation
+- Follow SOLID principles
+- Use proper indentation and formatting
+
+## Code Updates
+- Make atomic, focused changes
+- Preserve existing patterns and conventions
+- Add/update tests for modified code
+- Document breaking changes
+- Update relevant documentation
+- Consider backwards compatibility
+
+## Testing & Quality
+- Write unit tests for new code
+- Test edge cases and error conditions
+- Run linter before committing
+- Review generated code for security issues
+- Verify performance impact of changes
+- Test both success and failure cases
+
+## Documentation 
+- Add JSDoc comments for public APIs
+- Document non-obvious implementation details
+- Keep README.md in sync with new capabilities
+- Update README for new features
+- Note any dependencies or configuration needed
+- Include examples for complex functionality
+- Document known limitations
+
+## Security
+- Validate all inputs
+- Escape output to prevent XSS
+- Use proper authentication/authorization
+- Follow secure coding practices
+- Never expose sensitive data
+- Handle errors securely
+
+## Performance
+- Consider algorithmic complexity
+- Minimize external dependencies
+- Cache expensive operations
+- Lazy load when possible
+- Profile code for bottlenecks
+- Consider memory usage
+
+## Collaboration
+- Use descriptive commit messages
+- Reference related issues/PRs
+- Request reviews for complex changes
+- Address review feedback promptly
+- Keep changes small and focused
+- Document design decisions
